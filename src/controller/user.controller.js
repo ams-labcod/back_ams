@@ -76,7 +76,7 @@ export const create_person = async (req, res) => {
        2️⃣ OBTENER PEO_ID
        =============================== */
     const [rows] = await pool.query(
-      'SELECT PEO_ID FROM ams_people WHERE PEO_IDENTIFICATION = ? LIMIT 1',
+      'SELECT PEO_ID FROM AMS_PEOPLE WHERE PEO_IDENTIFICATION = ? LIMIT 1',
       [usu_identification]
     )
 
@@ -106,7 +106,7 @@ export const create_person = async (req, res) => {
       console.log('🔐 Password hasheado')
       // const pass = usu_identification;
       const [resultUser] = await pool.query(
-        'INSERT INTO ams_users (USU_ID, USU_USER, USU_PASSWORD, USU_ROLE, USU_PEO_ID) VALUES (UUID(), ?, ?, ?, ?)',
+        'INSERT INTO AMS_USERS (USU_ID, USU_USER, USU_PASSWORD, USU_ROLE, USU_PEO_ID) VALUES (UUID(), ?, ?, ?, ?)',
         [
           usu_identification, // usuario
           hashPassword,       // password
@@ -146,7 +146,7 @@ export const login = async (req, res) => {
   try {
 
     //verificamos si existe el correo
-    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM ams_people p INNER JOIN ams_users u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
+    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM AMS_PEOPLE p INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
 
     //si el correo no existe
     if (data.length === 0) return res.status(404).json({ Message: 'Correo Incorrecto o no existe' })
