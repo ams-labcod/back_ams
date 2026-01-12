@@ -167,7 +167,7 @@ router.post('/create_person',[
         .notEmpty().withMessage('El lugar de nacimiento es requerido'),
 
     check('usu_cel')
-        .isNumeric().withMessage('El celular debe ser un numero')
+        .isString().withMessage('El celular debe ser un numero')
         .isLength({ min: 10, max: 10 }).withMessage('El celular debe tener 10 dígitos'),
 
     check('usu_correo')
