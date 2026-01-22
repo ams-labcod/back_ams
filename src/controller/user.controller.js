@@ -30,16 +30,36 @@ export const create_person = async (req, res) => {
     usu_prev_school,
     usu_allergies,
     usu_condition
-  } = req.body
+  } = req.body;
+
+  let connection;
 
   try {
-    console.log('================ INICIO CREATE_PERSON ================')
+    console.log('================ INICIO CREATE_PERSON ================');
 
-    /* ===============================
-       1️⃣ INSERT PERSONA
-       =============================== */
-    const [resultPeople] = await pool.query(
-      'INSERT INTO AMS_PEOPLE (PEO_ID, PEO_NAME_1, PEO_NAME_2, PEO_LAST_NAME_1, PEO_LAST_NAME_2, PEO_TP_PERSON, PEO_TP_ID, PEO_IDENTIFICATION, PEO_LEVEL, PEO_TP_REG, PEO_GRADE, PEO_GRADE_L, PEO_SEX, PEO_BIRTH, PEO_PLACE_BIRTH, PEO_CEL, PEO_EMAIL, PEO_CITY, PEO_DEPARTAMENT, PEO_ADDRESS, PEO_EPS, PEO_POPULATION, PEO_PREV_SCHOOL, PEO_ALLERGIES, PEO_CONDITION, PEO_TYPE, PEO_STATE) VALUES (UUID(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+    // 1️⃣ Obtener conexión
+    connection = await pool.getConnection();
+
+    // 2️⃣ Iniciar transacción
+    await connection.beginTransaction();
+
+    // 3️⃣ Validar identificación existente
+    const [exists] = await connection.query(
+      'SELECT 1 FROM AMS_PEOPLE WHERE PEO_IDENTIFICATION = ? LIMIT 1',
+      [usu_identification]
+    );
+
+    if (exists.length > 0) {
+      await connection.rollback();
+      return res.status(409).json({
+        status: false,
+        message: 'Ya existe una persona registrada con esta identificación'
+      });
+    }
+
+    // 4️⃣ Insert PERSONA
+    await connection.query(
+'INSERT INTO AMS_PEOPLE (PEO_ID, PEO_NAME_1, PEO_NAME_2, PEO_LAST_NAME_1, PEO_LAST_NAME_2, PEO_TP_PERSON, PEO_TP_ID, PEO_IDENTIFICATION, PEO_LEVEL, PEO_TP_REG, PEO_GRADE, PEO_GRADE_L, PEO_SEX, PEO_BIRTH, PEO_PLACE_BIRTH, PEO_CEL, PEO_EMAIL, PEO_CITY, PEO_DEPARTAMENT, PEO_ADDRESS, PEO_EPS, PEO_POPULATION, PEO_PREV_SCHOOL, PEO_ALLERGIES, PEO_CONDITION, PEO_TYPE, PEO_STATE) VALUES (UUID(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
       [
         usu_name1,
         usu_name2,
@@ -68,75 +88,98 @@ export const create_person = async (req, res) => {
         'A',
         'A'
       ]
-    )
+    );
 
-    console.log('🆔 Persona creada:', resultPeople)
-
-    /* ===============================
-       2️⃣ OBTENER PEO_ID
-       =============================== */
-    const [rows] = await pool.query(
+    // 5️⃣ Obtener PEO_ID
+    const [rows] = await connection.query(
       'SELECT PEO_ID FROM AMS_PEOPLE WHERE PEO_IDENTIFICATION = ? LIMIT 1',
       [usu_identification]
-    )
+    );
 
-    if (rows.length === 0) {
-      throw new Error('No se pudo obtener el PEO_ID')
-    }
+    const peoId = rows[0].PEO_ID;
 
-    const peoId = rows[0].PEO_ID
-    console.log('🔗 PEO_ID obtenido:', peoId)
+    // 6️⃣ Crear usuario si aplica
+    const tipoPersona = usu_tp_person?.trim().toUpperCase();
 
-    /* ===============================
-       3️⃣ CREAR USUARIO (SI APLICA)
-       =============================== */
-    const tipoPersona = usu_tp_person?.trim().toUpperCase()
-    console.log('🔄 Tipo normalizado:', tipoPersona)
+    if (tipoPersona === 'ESTUDIANTE' || tipoPersona === 'DOCENTE') {
 
-    if (tipoPersona === 'ESTUDIANTE' || tipoPersona === 'PROFESOR') {
+      const role = tipoPersona === 'ESTUDIANTE'
+        ? 'ROL_STUDENT'
+        : 'ROL_TEACHER';
 
-      const role =
-        tipoPersona === 'ESTUDIANTE'
-          ? 'ROL_STUDENT'
-          : 'ROL_TEACHER'
+      const hashPassword = await bcrypt.hash(usu_identification, salt);
 
-      console.log('🎭 Rol asignado:', role)
-      const usu_password = usu_identification // Contraseña inicial igual a la identificación
-      const hashPassword = await bcrypt.hash(usu_password, salt)
-      console.log('🔐 Password hasheado')
-      // const pass = usu_identification;
-      const [resultUser] = await pool.query(
+      await connection.query(
         'INSERT INTO AMS_USERS (USU_ID, USU_USER, USU_PASSWORD, USU_ROLE, USU_PEO_ID) VALUES (UUID(), ?, ?, ?, ?)',
         [
-          usu_identification, // usuario
-          hashPassword,       // password
-          role,               // rol
-          peoId               // FK persona
+          usu_identification,
+          hashPassword,
+          role,
+          peoId
         ]
-      )
+      );
 
-      console.log('👤 Usuario creado:', resultUser)
-    } else {
-      console.log('ℹ️ Tipo de persona sin usuario')
+      // 7️⃣ DOCENTE
+      if (tipoPersona === 'DOCENTE') {
+        await connection.query(
+          'INSERT INTO AMS_TEACHERS (TEA_PEO_ID, TEA_NAME,TEA_LAST_NAME, TEA_IDENTIFICATION, TEA_THEME, TEA_GROUP_DIR, TEA_STATE) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [
+            peoId,
+            usu_name1,
+            usu_lastname1,
+            usu_identification,
+            '',
+            usu_grade,
+            'A'
+          ]
+        );
+      }
+
+      // 8️⃣ ESTUDIANTE
+      if (tipoPersona === 'ESTUDIANTE') {
+        await connection.query(
+          'INSERT INTO AMS_ESTUDENTS (EST_ID, EST_NAME, EST_LAST_NAME,EST_IDENTIFICATION,EST_GROUP, EST_STATE, EST_PEO_ID) VALUES (UUID(), ?, ?, ?, ?, ?, ?)',
+          [ usu_name1,
+            usu_lastname1,
+            usu_identification,
+            usu_grade,
+            'A',
+            peoId
+          ]
+        );
+                console.log('📌 Datos del estudiante:', {
+          usu_name1,
+          usu_lastname1,
+          usu_identification,
+          usu_grade
+        });
+      }
     }
 
-    console.log('================ FIN CREATE_PERSON ================')
+    // 9️⃣ Confirmar transacción
+    await connection.commit();
 
     return res.status(201).json({
       status: true,
       message: 'Persona registrada correctamente'
-    })
+    });
 
   } catch (error) {
-    console.error('❌ ERROR CREATE_PERSON')
-    console.error(error)
+    if (connection) await connection.rollback();
+
+    console.error('❌ ERROR CREATE_PERSON');
+    console.error(error);
 
     return res.status(500).json({
       status: false,
       message: 'Error en el servidor'
-    })
+    });
+
+  } finally {
+    if (connection) connection.release();
   }
-}
+};
+
 
 
 export const login = async (req, res) => {
@@ -146,13 +189,13 @@ export const login = async (req, res) => {
   try {
 
     //verificamos si existe el correo
-    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM AMS_PEOPLE p INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
+    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM ams_people p INNER JOIN ams_users u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
 
     //si el correo no existe
     if (data.length === 0) return res.status(404).json({ Message: 'Correo Incorrecto o no existe' })
 
     //verificar si el usuario esta activo
-    const [checkState] = await pool.query('SELECT PEO_STATE FROM AMS_PEOPLE WHERE PEO_IDENTIFICATION = ? ', [usu_user])
+    const [checkState] = await pool.query('SELECT PEO_STATE FROM ams_people WHERE PEO_IDENTIFICATION = ? ', [usu_user])
 
     //Validamos el estado
     const state = checkState[0].PEO_STATE
@@ -164,12 +207,12 @@ export const login = async (req, res) => {
 
     //comparmos contraseñas- usu_password,
     const passwordPlano = String(usu_password).trim();
-    const passwordHash  = String(storedcontrasena).trim();
+    const passwordHash = String(storedcontrasena).trim();
     // const checkPassword = await bcrypt.compare( usu_password, storedcontrasena);
     const checkPassword = await bcrypt.compare(
-            passwordPlano,
-            passwordHash
-          );
+      passwordPlano,
+      passwordHash
+    );
     //sino coinciden
     if (!checkPassword) return res.status(401).json({ Message: 'Password incorrecta - password' })
     console.log(checkPassword)
@@ -181,7 +224,7 @@ export const login = async (req, res) => {
     const usu_correo = data[0].PEO_EMAIL
     const usu_role = data[0].usu_role
     const usu_state = data[0].PEO_STATE
-    
+
     //-- generamos el jwt
     const token = await generateJwt(peoId, usu_identification, usu_name1, usu_lastname1, usu_correo, usu_role, usu_state)
     console.log('Token generado:', token)

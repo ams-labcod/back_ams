@@ -3,10 +3,11 @@ import { check } from 'express-validator';
 
 import { create_person, login } from '../controller/user.controller.js';
 import { validations } from '../middlewares/validations.js';
+import { verifyJwt } from '../middlewares/verifyToken.js'
 
 const router = Router();
 
-router.post('/create_person',[
+router.post('/create_person',verifyJwt,[
         check('usu_name1')
         .isString().withMessage('El primer nombre debe ser un Texto')
         .notEmpty().withMessage('El primer nombre es requerido'),
