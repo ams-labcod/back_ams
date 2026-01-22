@@ -1,6 +1,9 @@
 import express from 'express';
 import userRoutes from './routes/users_routes.js';
+import create_course from './routes/courses_routes.js';
 import cors from 'cors';    
+//import endpoint
+import Routes from './routes/index.js'
 
 const app = express();
 
@@ -20,5 +23,6 @@ app.use(express.json());
 
 // Routes
 app.use('/', userRoutes);
+app.use('/', create_course);
 
 export default app;
