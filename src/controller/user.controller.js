@@ -189,13 +189,13 @@ export const login = async (req, res) => {
   try {
 
     //verificamos si existe el correo
-    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM AMS_PEOPLE p INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
+    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM ams_people p INNER JOIN ams_users u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
 
     //si el correo no existe
     if (data.length === 0) return res.status(404).json({ Message: 'Correo Incorrecto o no existe' })
 
     //verificar si el usuario esta activo
-    const [checkState] = await pool.query('SELECT PEO_STATE FROM AMS_PEOPLE WHERE PEO_IDENTIFICATION = ? ', [usu_user])
+    const [checkState] = await pool.query('SELECT PEO_STATE FROM ams_people WHERE PEO_IDENTIFICATION = ? ', [usu_user])
 
     //Validamos el estado
     const state = checkState[0].PEO_STATE
