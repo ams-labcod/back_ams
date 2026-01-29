@@ -9,7 +9,6 @@ export const create_course = async (req, res) => {
     cou_level,
     cou_name_teach,
     cou_num_courses,
-    cou_theme
   } = req.body;
 
   try {
@@ -38,12 +37,11 @@ export const create_course = async (req, res) => {
     
     // 🧱 Insertar curso
     const [result] = await pool.query(
-     'INSERT INTO AMS_COURSES (COU_LEVEL, COU_NAME_TEACH, COU_NUM_COURSE, COU_THEME, COU_STATE) VALUES (?, ?, ?, ?, ?)',
+     'INSERT INTO AMS_COURSES (COU_LEVEL, COU_NAME_TEACH, COU_NUM_COURSE, COU_STATE) VALUES (?, ?, ?, ?)',
       [
         cou_level,
         cou_name_teach,
         cou_num_courses || null,
-        cou_theme || null,
         'A'
       ]
     );

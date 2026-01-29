@@ -4,8 +4,8 @@ import { check } from 'express-validator';
 // import { create_course } from '../controllers/courses.controller.js';
 import { create_course } from '../controller/courses.controller.js';
 import { validations } from '../middlewares/validations.js';
-
-import { verifyJwt } from '../middlewares/verifyToken.js'
+import { verifyJwt } from '../middlewares/verifyToken.js';
+import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 const router = Router();
 
@@ -39,7 +39,7 @@ const CURSOS_POR_NIVEL = {
 };
 router.post(
   '/create_course',
-  verifyJwt,
+  verifyJwt,validateRolAdmin,
   [
 
     /* ===============================
@@ -146,9 +146,9 @@ router.post(
     /* ===============================
        MATERIAS / TEMAS
     =============================== */
-    check('cou_theme')
-      .notEmpty().withMessage('Las materias del curso son obligatorias')
-      .isString()
+    // check('cou_theme')
+    //   .notEmpty().withMessage('Las materias del curso son obligatorias')
+    //   .isString()
 
   ],
   validations,
