@@ -101,11 +101,19 @@ export const create_person = async (req, res) => {
     // 6️⃣ Crear usuario si aplica
     const tipoPersona = usu_tp_person?.trim().toUpperCase();
 
-    if (tipoPersona === 'ESTUDIANTE' || tipoPersona === 'DOCENTE') {
+    if (tipoPersona === 'ESTUDIANTE' || tipoPersona === 'DOCENTE' || tipoPersona === 'ADMINISTRATIVO') {
 
-      const role = tipoPersona === 'ESTUDIANTE'
-        ? 'ROL_STUDENT'
-        : 'ROL_TEACHER';
+      let role = null;
+      // const role = tipoPersona === 'ESTUDIANTE'
+      //   ? 'ROL_STUDENT'
+      //   : 'ROL_TEACHER';
+      if (tipoPersona === 'ESTUDIANTE') {
+          role = 'ROL_STUDENT';
+        } else if (tipoPersona === 'DOCENTE') {
+          role = 'ROL_TEACHER';
+        } else if (tipoPersona === 'ADMINISTRATIVO') {
+          role = 'ROL_ADMINISTRATIVO';
+        }
 
       const hashPassword = await bcrypt.hash(usu_identification, salt);
 
@@ -147,14 +155,12 @@ export const create_person = async (req, res) => {
             peoId
           ]
         );
-                console.log('📌 Datos del estudiante:', {
-          usu_name1,
-          usu_lastname1,
-          usu_identification,
-          usu_grade
-        });
       }
+       if (tipoPersona === 'ESTUDIANTE') {
+
+       }
     }
+    
 
     // 9️⃣ Confirmar transacción
     await connection.commit();
@@ -192,7 +198,7 @@ export const login = async (req, res) => {
     const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM ams_people p INNER JOIN ams_users u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
 
     //si el correo no existe
-    if (data.length === 0) return res.status(404).json({ Message: 'Correo Incorrecto o no existe' })
+    if (data.length === 0) return res.status(404).json({ Message: 'Identificación incorrecta o no existe en el sistema' })
 
     //verificar si el usuario esta activo
     const [checkState] = await pool.query('SELECT PEO_STATE FROM ams_people WHERE PEO_IDENTIFICATION = ? ', [usu_user])
@@ -248,38 +254,169 @@ export const login = async (req, res) => {
     res.status(500).json({ Message: 'Error en el servidor' })
 
   }
-  // const [data] = await pool.query(
-  //     'SELECT USU_USER, USU_PASSWORD FROM AMS_USERS WHERE USU_USER = ?',
-  //     [usu_user]
-  // );
-  // console.log(data[0]);
-  // if (!data || data.length === 0) {
-  //     return res.status(404).json({
-  //         status: false,
-  //         message: 'Usuario no encontrado'
-  //     });
-  // }
 
-  // 👇 USAR EL NOMBRE REAL DE LA COLUMNA
-  //     const storedPassword = data[0].USU_PASSWORD;
-  //     console.log(data[0]);
-  //     if (usu_password !== storedPassword) {
-  //         return res.status(401).json({
-  //             status: false,
-  //             message: 'Password incorrecta'
-  //         });
-  //     }
-
-  //     return res.status(200).json({
-  //         status: true,
-  //         message: 'Usuario logueado correctamente'
-  //     });
-
-  // } catch (error) {
-  //     console.error(error);
-  //     return res.status(500).json({
-  //         status: false,
-  //         message: 'Error en el servidor'
-  //     });
-  // }
 }
+
+//ver todos los usuarios
+export const getusers = async (req, res) => {
+
+    const {limit , offset} = req.query;
+
+    const limitValue = limit ? Number(limit): 10
+
+    const offsetValue = offset ? Number(offset) : 0
+
+    try {
+
+         const [totalUser] = await pool.query('SELECT COUNT(*) AS total FROM ams_users')
+
+         const [users] = await pool.query('SELECT * FROM ams_users LIMIT ? OFFSET ? ', [limitValue, offsetValue])
+
+         const total = totalUser[0].total
+
+        res.json({total, users})
+
+    } catch (error) {
+
+        console.log(error)
+
+        return res.status(500).json({ errorMessage: 'Error en el servidor' })
+    }
+}
+
+//ver perfil del usuario
+export const userProfile = async (req, res) => {
+
+    const { peoId  } = req.user;
+    
+    try {
+        const [data] = await pool.query('SELECT * FROM ams_users WHERE USU_PEO_ID =?', [peoId])
+        console.log(data)
+        if (data.length === 0) return res.status(404).json({ Message: 'Usuario no encontrado' })
+
+        //sacamos la data para mostrarla
+     
+        
+        const {usu_id, usu_user, usu_password, usu_role,usu_peo_id, ...user} = data[0]
+
+        //return res.json({user})
+
+        
+        const response = {
+            content: {
+                user
+            }, 
+            status:true,
+            message: 'Informacion del perfil del usuario'
+        }
+
+        const Data = {
+            data: response
+        }
+       
+        return res.status(200).json(Data)
+
+
+    } catch (error) {
+
+        console.log(error)
+
+        return res.status(500).json({ errorMessage: 'Error en el servidor' })
+    }
+}
+
+
+
+// Obtener información del usuario por usu_user
+export const getUserProfileByUser = async (req, res) => {
+
+  const { id_users } = req.params;
+  console.log('usu_user:', id_users);
+  try {
+
+    /* ===============================
+       1️⃣ Usuario
+    =============================== */
+    const [users] = await pool.query(
+      'SELECT USU_ID, USU_PEO_ID FROM AMS_USERS WHERE USU_USER = ? LIMIT 1',
+      [id_users]
+    );
+    
+    if (users.length === 0) {
+      return res.status(404).json({ Message: 'Usuario no encontrado' });
+    }
+
+    const { USU_ID, USU_PEO_ID } = users[0];
+
+    /* ===============================
+       2️⃣ Persona
+    =============================== */
+    const [people] = await pool.query(
+      `SELECT *
+       FROM AMS_PEOPLE
+       WHERE PEO_ID = ?
+       LIMIT 1`,
+      [USU_PEO_ID]
+    );
+
+    if (people.length === 0) {
+      return res.status(404).json({ Message: 'Persona no encontrada' });
+    }
+
+    const personData = people[0];
+        const [contacts] = await pool.query(
+      `SELECT *
+       FROM AMS_CONTACT
+       WHERE CON_PEO_ID = ?
+       LIMIT 1`,
+      [USU_PEO_ID]
+    );
+    const contactData = contacts.length > 0 ? contacts[0] : null;
+    /* ===============================
+       3️⃣ Buscar si es docente
+    =============================== */
+    const [teachers] = await pool.query(
+      `SELECT *
+       FROM AMS_TEACHERS
+       WHERE TEA_PEO_ID = ?
+       LIMIT 1`,
+      [USU_PEO_ID]
+    );
+
+    /* ===============================
+       4️⃣ Buscar si es estudiante
+    =============================== */
+    const [students] = await pool.query(
+      `SELECT *
+       FROM AMS_ESTUDENTS
+       WHERE EST_PEO_ID = ?
+       LIMIT 1`,
+      [USU_PEO_ID]
+    );
+
+    /* ===============================
+       5️⃣ Armar respuesta
+    =============================== */
+    const response = {
+      content: {
+        usu_id: USU_ID,
+        people: personData,
+        contact: contactData,
+        teacher: teachers.length > 0 ? teachers[0] : null,
+        student: students.length > 0 ? students[0] : null
+      },
+      status: true,
+      message: 'Información del perfil del usuario'
+    };
+
+    res.json({ data: response });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      errorMessage: 'Error en el servidor'
+    });
+  }
+};
