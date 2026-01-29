@@ -5,11 +5,11 @@ import { generateJwt } from '../helpers/generate-jwt.js'
 
 export const create_course = async (req, res) => {
 
-  const {
-    cou_level,
-    cou_name_teach,
-    cou_num_courses,
-  } = req.body;
+let {
+  cou_level,
+  cou_name_teach,
+  cou_num_courses,
+} = req.body;
 
   try {
 
@@ -49,9 +49,9 @@ export const create_course = async (req, res) => {
     return res.status(201).json({
       status: true,
       message: 'Curso creado correctamente',
-      data: {
-        cou_id: result.insertId
-      }
+      // data: {
+      //   cou_id: result.insertId
+      // }
     });
 
   } catch (error) {
