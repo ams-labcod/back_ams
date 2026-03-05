@@ -9,7 +9,7 @@ import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 const router = Router();
 // ,validateRolAdministrativo,
-router.post('/create_person', verifyJwt,validateRolAdmin,[
+router.post('/create_person',[
     check('usu_name1')
         .isString().withMessage('El primer nombre debe ser un Texto')
         .notEmpty().withMessage('El primer nombre es requerido'),

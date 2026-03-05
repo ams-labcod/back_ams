@@ -29,14 +29,14 @@ export const create_person = async (req, res) => {
     usu_population,
     usu_prev_school,
     usu_allergies,
-    usu_condition
+    usu_condition, 
+    cou_id
   } = req.body;
 
   let connection;
 
   try {
-    console.log('================ INICIO CREATE_PERSON ================');
-
+    
     // 1️⃣ Obtener conexión
     connection = await pool.getConnection();
 
@@ -146,19 +146,16 @@ export const create_person = async (req, res) => {
       // 8️⃣ ESTUDIANTE
       if (tipoPersona === 'ESTUDIANTE') {
         await connection.query(
-          'INSERT INTO AMS_ESTUDENTS (EST_ID, EST_NAME, EST_LAST_NAME,EST_IDENTIFICATION,EST_GROUP, EST_STATE, EST_PEO_ID) VALUES (UUID(), ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO AMS_ESTUDENTS (EST_ID, EST_NAME, EST_LAST_NAME,EST_IDENTIFICATION,EST_GROUP, EST_PEO_ID, COU_ID) VALUES (UUID(), ?, ?,?, ?, ?, ?)',
           [ usu_name1,
             usu_lastname1,
             usu_identification,
             usu_grade,
-            'A',
-            peoId
+            peoId,
+            cou_id || null // -> Se le asigna un curso a un estudiante
           ]
         );
       }
-       if (tipoPersona === 'ESTUDIANTE') {
-
-       }
     }
     
 
