@@ -1,10 +1,13 @@
 import { Router } from 'express';
+
 import { check } from 'express-validator';
 
-// import { create_course } from '../controllers/courses.controller.js';
-import { create_course } from '../controller/courses.controller.js';
+import { createCourse, getCourseById, getAllCourses, getAllCoursesAct, updateCourse, disableCourse} from '../controller/courses.controller.js'
+
 import { validations } from '../middlewares/validations.js';
+
 import { verifyJwt } from '../middlewares/verifyToken.js';
+
 import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 const router = Router();
@@ -152,7 +155,19 @@ router.post(
 
   ],
   validations,
-  create_course
+  createCourse
+
 );
+
+router.get('/getOne/:id_course', verifyJwt, getCourseById );
+
+router.get('/getAllCourses', verifyJwt, getAllCourses);
+
+router.get('/getAllCourseAct', verifyJwt, getAllCoursesAct);
+
+router.put('/courses/:id',verifyJwt,validateRolAdmin, updateCourse )
+
+router.patch('/courses/:id',verifyJwt,validateRolAdmin,disableCourse)
+
 
 export default router;
