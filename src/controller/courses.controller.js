@@ -1,5 +1,6 @@
 import { pool } from '../config/db.js'
 
+
 //  ***************************CREAR CURSO**********************************
 export const createCourse = async (req, res) => {
   
