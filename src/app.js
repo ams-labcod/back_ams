@@ -14,6 +14,8 @@ import periodRoute from './routes/period.route.js'
 
 import notesRoute from './routes/note.route.js'
 
+import assistanceRoute from './routes/assitance.route.js'
+
 import cors from 'cors';    
 
 //import endpoint
@@ -43,4 +45,5 @@ app.use('/', subject_route)
 app.use('/', evaluationRoute)
 app.use('/', periodRoute)
 app.use('/', notesRoute)
+app.use('/', assistanceRoute)
 export default app;

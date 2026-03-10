@@ -19,8 +19,6 @@ try {
     const [result] = await pool.query('INSERT INTO AMS_COURSE_SUBJECT (COU_ID, TEA_PEO_ID, COS_SUBJECT_NAME, COS_STATE) VALUES (?,?,?,?) ',
         [cou_id,tea_peo_id,cos_subject_name, 'A']
     )
-     
-
     
     const response = {
         content : null,

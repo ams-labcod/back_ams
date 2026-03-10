@@ -2,7 +2,7 @@ import { request, response } from 'express'
 
 import {pool} from '../config/db.js'
 
-//* Get all de notas de todos las asignaturas de todos los cursos
+//* Obtener todas las notas de todas las asignaturas
 export const getAllNotes = async (req = request, res = response ) => {
     try {
     const [notes] = await pool.query(
