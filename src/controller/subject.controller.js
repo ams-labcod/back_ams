@@ -13,13 +13,15 @@ try {
 
     if(validateSubjet.length > 0){
 
-        return res.status(404).json({message: 'La materia ya fue registrada en este curso'})
+        return res.status(400).json({message: 'La materia ya fue registrada en este curso'})
     }
 
-    const [result] = await pool.query('INSERT INTO AMS_COURSE_SUBJECT (COS_ID,COU_ID, TEA_PEO_ID, COS_SUBJECT_NAME, COS_STATE) VALUES (UUID(),?,?,?,?) ',
+    const [result] = await pool.query('INSERT INTO AMS_COURSE_SUBJECT (COU_ID, TEA_PEO_ID, COS_SUBJECT_NAME, COS_STATE) VALUES (?,?,?,?) ',
         [cou_id,tea_peo_id,cos_subject_name, 'A']
     )
      
+
+    
     const response = {
         content : null,
         status : true,

@@ -12,6 +12,8 @@ import evaluationRoute from './routes/evaluation.route.js'
 
 import periodRoute from './routes/period.route.js'
 
+import notesRoute from './routes/note.route.js'
+
 import cors from 'cors';    
 
 //import endpoint
@@ -40,4 +42,5 @@ app.use('/', criteria_routes);
 app.use('/', subject_route)
 app.use('/', evaluationRoute)
 app.use('/', periodRoute)
+app.use('/', notesRoute)
 export default app;
