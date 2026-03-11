@@ -8,6 +8,7 @@ import { validateRoles } from "../middlewares/validateRols.js";
 
 const router = Router()
 
+
 //* - PROFESOR
 router.get('/getAllNotes', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMIN', 'ROL_ADMINISTRATIVO'),  getAllNotes )
 //* - PROFESOR
