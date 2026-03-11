@@ -1,11 +1,14 @@
 import { Router } from 'express';
+
 import { check } from 'express-validator';
 
 import { create_person, login, getusers, userProfile, getUserProfileByUser } from '../controller/user.controller.js';
+
 import { validations } from '../middlewares/validations.js';
+
 import { verifyJwt } from '../middlewares/verifyToken.js'
-import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
-// import { validateRolAdministrativo } from '../middlewares/validateRolAdministrativo.js';
+
+import { validateRoles } from '../middlewares/validateRols.js';
 
 const router = Router();
 // ,validateRolAdministrativo,
@@ -225,7 +228,7 @@ router.post(
     login
 );
 
-router.get('/get_users', verifyJwt, validateRolAdmin, getusers);
+router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getusers);
 
 //Ver perfil (persona verificado - privada )-- 
 router.get('/users/profile', verifyJwt, userProfile)

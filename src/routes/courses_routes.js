@@ -8,7 +8,7 @@ import { validations } from '../middlewares/validations.js';
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
+import { validateRoles } from '../middlewares/validateRols.js';
 
 const router = Router();
 
@@ -42,7 +42,7 @@ const CURSOS_POR_NIVEL = {
 };
 router.post(
   '/create_course',
-  verifyJwt,validateRolAdmin,
+  verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),
   [
 
     /* ===============================
@@ -155,21 +155,18 @@ router.post(
 
   ],
   validations,
-  verifyJwt,
-  validateRolAdmin,
   createCourse
 
 );
 
-router.get('/getOne/:id_course', verifyJwt,getCourseById );
+router.get('/getOne/:id_course', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),getCourseById );
 
-router.get('/getAllCourses', verifyJwt, getAllCourses);
+router.get('/getAllCourses', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCourses);
 
-router.get('/getAllCourseAct', verifyJwt, getAllCoursesAct);
+router.get('/getAllCourseAct', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCoursesAct);
 
-router.put('/courses/:id',verifyJwt,validateRolAdmin, updateCourse )
+router.put('/courses/:id',verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), updateCourse )
 
-router.patch('/courses/:id',verifyJwt,validateRolAdmin,disableCourse)
-
+router.patch('/courses/:id',verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),disableCourse)
 
 export default router;

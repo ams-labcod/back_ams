@@ -20,6 +20,8 @@ import evaluationType from './routes/evaluationType.route.js'
 
 import reportedRoute from './routes/report.route.js'
 
+import studentRoute from './routes/student.route.js'
+
 import cors from 'cors';    
 
 //import endpoint
@@ -52,4 +54,5 @@ app.use('/', notesRoute)
 app.use('/', assistanceRoute)
 app.use('/', evaluationType)
 app.use('/', reportedRoute)
+app.use('/', studentRoute)
 export default app;
