@@ -7,4 +7,5 @@ export default {
     courses_routes,
     user_routes,
     criteria_routes,
+    
 }
