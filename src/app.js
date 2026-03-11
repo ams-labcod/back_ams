@@ -20,7 +20,8 @@ import evaluationType from './routes/evaluationType.route.js'
 
 import reportedRoute from './routes/report.route.js'
 
-import studentRoute from './routes/student.route.js'
+import logrosRoutes from './routes/logros.routes.js'
+
 
 import cors from 'cors';    
 
@@ -54,5 +55,5 @@ app.use('/', notesRoute)
 app.use('/', assistanceRoute)
 app.use('/', evaluationType)
 app.use('/', reportedRoute)
-app.use('/', studentRoute)
+app.use('/', logrosRoutes)  
 export default app;
