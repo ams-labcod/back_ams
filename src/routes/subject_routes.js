@@ -10,6 +10,8 @@ import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 import { createSubject, disableCourseSubject, getAllCourseSubjects, getCourseSubjectById, updateCourseSubject } from "../controller/subject.controller.js";
 
+import { validateRolAdministrativo } from "../middlewares/validateRolAdministrativo.js";
+
 const router = Router();
 
 router.post('/createSubject', verifyJwt, validateRolAdmin, createSubject)
@@ -20,6 +22,6 @@ router.get('/getOneSubject/:id', verifyJwt, getCourseSubjectById)
 
 router.put('/updateSubject/:id', verifyJwt, validateRolAdmin, updateCourseSubject)
 
-router.patch('/deleteSubject/:id', verifyJwt, validateRolAdmin,disableCourseSubject)
+router.patch('/deleteSubject/:id', verifyJwt, validateRolAdmin, disableCourseSubject)
 
 export default router;

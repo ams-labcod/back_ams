@@ -2,13 +2,15 @@ import { Router } from "express";
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import { getAllNotes } from "../controller/notes.controller.js";
+import { createNote, getAllNotes } from "../controller/notes.controller.js";
 
-import { validateRolAdministrativo } from "../middlewares/validateRolAdministrativo.js";
+import { validateRoles } from "../middlewares/validateRols.js";
 
 const router = Router()
 
-//* ADMIN
-router.get('/getAll', verifyJwt, getAllNotes )
+//* - PROFESOR
+router.get('/getAllNotes', verifyJwt, validateRoles('ROL_TEACHER'),  getAllNotes )
+//* - PROFESOR
+router.post('/createNote', verifyJwt,validateRoles('ROL_TEACHER'), createNote)
 
 export default router
