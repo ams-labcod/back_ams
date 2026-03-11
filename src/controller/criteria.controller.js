@@ -65,12 +65,14 @@ export const create_criteria = async (req = request, res = response) => {
     if (connection) await connection.rollback();
 
     console.error('❌ ERROR CREATE_CRITERIA');
-    console.error(error);
+
+    console.error(error)
 
     return res.status(500).json({
       status: false,
-      message: 'Error al crear el criterio'
-    });
+      message: 'Error interno del servidor',
+      error: error.message
+    })
 
   } finally {
     if (connection) connection.release();

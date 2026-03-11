@@ -1,4 +1,4 @@
-
+//*   CAMBIAR PARA QUE SOLAMENTE AGARRE EL ROL DE PROFESOR
 import { response, request } from 'express';
 
 export const validateRolAdministrativo = (req = request, res = response, next) => {

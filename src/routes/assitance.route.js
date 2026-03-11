@@ -8,7 +8,7 @@ import { getAllAssitance } from "../controller/assistance.controller.js";
 
 const router = Router()
 
-//* ADMIN
-router.get('/getAllAssistance', verifyJwt, validateRolAdministrativo ,getAllAssitance )
+//* PROFESOR
+router.get('/getAllAssistance', verifyJwt ,getAllAssitance )
 
 export default router

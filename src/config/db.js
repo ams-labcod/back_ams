@@ -10,7 +10,8 @@ import '../utils/env.js'
 //  })
 
 export const pool = createPool(
-//  'mysql://ue6lzi4rzrwbgeew:p3DNp4j6ogym2GBpeY9n@blj394itpypibv4ybum6-mysql.services.clever-cloud.com:3306/blj394itpypibv4ybum6' -> CLEVER
+//  //'mysql://ue6lzi4rzrwbgeew:p3DNp4j6ogym2GBpeY9n@blj394itpypibv4ybum6-mysql.services.clever-cloud.com:3306/blj394itpypibv4ybum6' -> CLEVER
  'mysql://root:ezhOhvAzRKHMePpLeQrTysKoutsQjnqQ@interchange.proxy.rlwy.net:29405/railway' //-> RAILWAY
 );
-export default pool;
+
+ export default pool;

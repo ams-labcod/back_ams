@@ -1,0 +1,25 @@
+import { Router } from "express";
+
+import { verifyJwt } from '../middlewares/verifyToken.js';
+
+import { validateRoles } from "../middlewares/validateRols.js";
+
+import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors } from "../controller/report.controller.js";
+
+const router = Router()
+
+//* admin/administrativo, elige el director de grupo
+router.patch('/teachers/:tea_peo_id/director',verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'), assignGroupDirector);
+
+//* - este reporte lo tendria que ver el administrativo y el director de grupo 
+router.get('/consolidated/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'),  getConsolidatedByCourse )
+
+//* Todos los cursos con sus directores
+router.get(
+  '/coursesDirectors/all', 
+  verifyJwt, 
+  validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), 
+  getAllCourseDirectors
+);
+
+export default router

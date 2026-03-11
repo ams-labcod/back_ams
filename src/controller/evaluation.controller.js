@@ -1,19 +1,18 @@
 import { request, response } from 'express'
 
-import {pool} from '../config/db.js'
+import { pool } from '../config/db.js'
 
-//! createEvaluation
-// Crear una nueva evaluación (actividad)
+
 export const createEvaluation = async (req = request, res = response) => {
 
   try {
-    const { 
-      eva_cos_id, 
-      eva_per_id, 
-      eva_name, 
-      eva_tp_type, 
-      eva_percent, 
-      eva_date 
+    const {
+      eva_cos_id,
+      eva_per_id,
+      eva_name,
+      eva_tp_type,
+      eva_percent,
+      eva_date
     } = req.body;
 
     // 1️⃣ Lógica de Negocio: Validar que los porcentajes no sumen más de 100%
@@ -24,10 +23,10 @@ export const createEvaluation = async (req = request, res = response) => {
     );
 
     const totalActual = currentSum[0].total_percent || 0;
-    
+
     if ((totalActual + parseInt(eva_percent)) > 100) {
-      return res.status(400).json({ 
-        message: `No se puede crear la evaluación. El porcentaje acumulado actual es ${totalActual}%, y con esta evaluación superaría el 100%.` 
+      return res.status(400).json({
+        message: `No se puede crear la evaluación. El porcentaje acumulado actual es ${totalActual}%, y con esta evaluación superaría el 100%.`
       });
     }
 
@@ -48,11 +47,16 @@ export const createEvaluation = async (req = request, res = response) => {
 
 
   } catch (error) {
-    console.error(error);
-    
+
     if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-        return res.status(400).json({ errorMessage: 'Error de integridad: El periodo, materia o tipo de evaluación no existen.' });
+      return res.status(400).json({ errorMessage: 'Error de integridad: El periodo, materia o tipo de evaluación no existen.' });
     }
-    return res.status(500).json({ errorMessage: 'Error en el servidor al crear la evaluación' });
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
   }
 };

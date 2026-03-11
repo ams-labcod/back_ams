@@ -1,9 +1,13 @@
 import { Router } from 'express';
+
 import { check } from 'express-validator';
 
 import { create_criteria } from '../controller/criteria.controller.js';
+
 import { validations } from '../middlewares/validations.js';
+
 import { verifyJwt } from '../middlewares/verifyToken.js';
+
 import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 const router = Router();

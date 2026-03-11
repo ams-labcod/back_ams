@@ -155,11 +155,13 @@ router.post(
 
   ],
   validations,
+  verifyJwt,
+  validateRolAdmin,
   createCourse
 
 );
 
-router.get('/getOne/:id_course', verifyJwt, getCourseById );
+router.get('/getOne/:id_course', verifyJwt,getCourseById );
 
 router.get('/getAllCourses', verifyJwt, getAllCourses);
 

@@ -1,10 +1,11 @@
 import { request, response } from 'express'
 
-import {pool} from '../config/db.js'
+import { pool } from '../config/db.js'
+
 
 //* Obtener todas las notas de todas las asignaturas
-export const getAllNotes = async (req = request, res = response ) => {
-    try {
+export const getAllNotes = async (req = request, res = response) => {
+  try {
     const [notes] = await pool.query(
       `SELECT 
         n.NOT_ID, 
@@ -41,4 +42,47 @@ export const getAllNotes = async (req = request, res = response ) => {
     return res.status(500).json({ errorMessage: 'Error en el servidor al obtener las notas' });
   }
 
+}
+
+export const createNote = async (req = request, res = response) => {
+
+  const { eva_id, not_est_id, not_value, not_date } = req.body
+
+  try {
+
+    const [validateStudent] = await pool.query('SELECT est_id FROM ams_estudents WHERE est_id = ? ', [not_est_id])
+
+    const [validateEvaluation] = await pool.query('SELECT eva_id FROM ams_evaluation WHERE eva_id = ?', [eva_id])
+
+    if (validateStudent.length ===  0) return res.status(400).json({ errorMessage: 'El estudiante no existe' })
+
+    if (validateEvaluation.length ===  0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
+
+    const [create] = await pool.query('INSERT INTO ams_notes (eva_id,not_est_id,not_value,not_date) VALUES (?,?,?,?)',
+      [eva_id, not_est_id, not_value, not_date])
+
+    const response = {
+
+      content: null,
+      status: true,
+      message: 'Nota Creada Correctamente'
+    }
+
+    const data = {
+      data: response
+    }
+
+    return res.status(200).json(data)
+
+  } catch (error) {
+
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+
+  }
 }
