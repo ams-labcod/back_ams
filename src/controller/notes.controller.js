@@ -50,15 +50,15 @@ export const createNote = async (req = request, res = response) => {
 
   try {
 
-    const [validateStudent] = await pool.query('SELECT est_id FROM ams_estudents WHERE est_id = ? ', [not_est_id])
+    const [validateStudent] = await pool.query('SELECT est_id FROM AMS_ESTUDENTS WHERE est_id = ? ', [not_est_id])
 
-    const [validateEvaluation] = await pool.query('SELECT eva_id FROM ams_evaluation WHERE eva_id = ?', [eva_id])
+    const [validateEvaluation] = await pool.query('SELECT eva_id FROM AMS_EVALUATION WHERE eva_id = ?', [eva_id])
 
     if (validateStudent.length ===  0) return res.status(400).json({ errorMessage: 'El estudiante no existe' })
 
     if (validateEvaluation.length ===  0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
 
-    const [create] = await pool.query('INSERT INTO ams_notes (eva_id,not_est_id,not_value,not_date) VALUES (?,?,?,?)',
+    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date) VALUES (?,?,?,?)',
       [eva_id, not_est_id, not_value, not_date])
 
     const response = {
