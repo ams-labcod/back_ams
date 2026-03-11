@@ -4,11 +4,11 @@ import { verifyJwt } from '../middlewares/verifyToken.js';
 
 import { createEvaluation } from "../controller/evaluation.controller.js";
 
-import { validateRolAdmin } from "../middlewares/validateRolAdmin.js";
+import { validateRoles } from "../middlewares/validateRols.js";
 
 const router = Router()
 
 //* CREERIA QUE LA EVALUCION LA CREA UN DOCENTE
-router.post('/createEvaluation', verifyJwt, validateRolAdmin, createEvaluation) 
+router.post('/createEvaluation', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMIN'), createEvaluation) 
 
 export default router

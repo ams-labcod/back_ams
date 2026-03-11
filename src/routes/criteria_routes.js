@@ -8,14 +8,13 @@ import { validations } from '../middlewares/validations.js';
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
+import { validateRoles } from '../middlewares/validateRols.js';
 
 const router = Router();
 
 router.post(
   '/create_criteria',
   verifyJwt,
-  validateRolAdmin,
   [
 
   check('cri_note_min')
@@ -76,6 +75,7 @@ router.post(
 
   ],
   validations,
+  validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),
   create_criteria
 );
 

@@ -1,27 +1,21 @@
 import { Router } from "express";
 
-import { check } from 'express-validator';
-
-import { validations } from '../middlewares/validations.js';
-
 import { verifyJwt } from '../middlewares/verifyToken.js';
-
-import { validateRolAdmin } from '../middlewares/validateRolAdmin.js';
 
 import { createSubject, disableCourseSubject, getAllCourseSubjects, getCourseSubjectById, updateCourseSubject } from "../controller/subject.controller.js";
 
-import { validateRolAdministrativo } from "../middlewares/validateRolAdministrativo.js";
+import { validateRoles } from "../middlewares/validateRols.js";
 
 const router = Router();
 
-router.post('/createSubject', verifyJwt, validateRolAdmin, createSubject)
+router.post('/createSubject', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), createSubject)
 
-router.get('/getSubjects', verifyJwt, getAllCourseSubjects)
+router.get('/getSubjects', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),getAllCourseSubjects)
 
-router.get('/getOneSubject/:id', verifyJwt, getCourseSubjectById)
+router.get('/getOneSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),getCourseSubjectById)
 
-router.put('/updateSubject/:id', verifyJwt, validateRolAdmin, updateCourseSubject)
+router.put('/updateSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), updateCourseSubject)
 
-router.patch('/deleteSubject/:id', verifyJwt, validateRolAdmin, disableCourseSubject)
+router.patch('/deleteSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), disableCourseSubject)
 
 export default router;
