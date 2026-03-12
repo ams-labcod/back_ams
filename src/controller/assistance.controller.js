@@ -39,3 +39,40 @@ export const getAllAssitance = async (req = request, res = response) => {
 
 
 }
+
+export const createAssitance = async (req = request, res = response) => {
+
+  try {
+
+    const { ass_id, est_id, cos_id, ass_date, ass_comment} = req.body
+
+    const [create] = await pool.query('INSERT INTO AMS_ASSISTANCE (ASS_ID, EST_ID, COS_ID, ASS_DATE, ASS_COMMENT) VALUES (?,?,?,?,?)',
+      [ass_id, est_id, cos_id, ass_date, ass_comment]
+    )
+
+    const response = {
+
+      content: null,
+      status: true,
+      message: 'Asistencia Creada Correctamente'
+    }
+
+    const data = {
+      data: response
+    }
+
+   return res.status(200).json(data)
+
+  } catch (error) {
+
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+
+  }
+
+}
