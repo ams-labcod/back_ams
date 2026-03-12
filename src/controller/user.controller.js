@@ -194,7 +194,24 @@ export const login = async (req, res) => {
   try {
 
     //verificamos si existe el correo
-    const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM AMS_PEOPLE p INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
+    // const [data] = await pool.query('SELECT  p.PEO_ID, p.PEO_IDENTIFICATION, p.PEO_NAME_1, p.PEO_LAST_NAME_1, p.PEO_EMAIL,p.PEO_STATE,u.USU_PASSWORD AS usu_password, u.USU_ROLE AS usu_role FROM AMS_PEOPLE p INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID WHERE p.PEO_IDENTIFICATION = ? LIMIT 1 ', [usu_user])
+    const [data] = await pool.query(
+      `SELECT 
+        p.PEO_ID, 
+        p.PEO_IDENTIFICATION, 
+        p.PEO_NAME_1, 
+        p.PEO_LAST_NAME_1, 
+        p.PEO_EMAIL,
+        p.PEO_STATE,
+        u.USU_PASSWORD AS usu_password, 
+        u.USU_ROLE AS usu_role,
+        t.TEA_PEO_ID -- Sacamos el ID del profesor (será null si es estudiante/admin)
+      FROM AMS_PEOPLE p 
+      INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID 
+      LEFT JOIN AMS_TEACHERS t ON t.TEA_PEO_ID = p.PEO_ID 
+      WHERE p.PEO_IDENTIFICATION = ? LIMIT 1`,
+      [usu_user]
+    );
 
     //si el correo no existe
     if (data.length === 0) return res.status(404).json({ Message: 'Identificación incorrecta o no existe en el sistema' })
@@ -229,9 +246,10 @@ export const login = async (req, res) => {
     const usu_correo = data[0].PEO_EMAIL
     const usu_role = data[0].usu_role
     const usu_state = data[0].PEO_STATE
+    const tea_peo_id = data[0].TEA_PEO_ID || null
 
     //-- generamos el jwt
-    const token = await generateJwt(peoId, usu_identification, usu_name1, usu_lastname1, usu_correo, usu_role, usu_state)
+    const token = await generateJwt(peoId, usu_identification, usu_name1, usu_lastname1, usu_correo, usu_role, usu_state, tea_peo_id)
     console.log('Token generado:', token)
     const response = {
       content: {
@@ -426,10 +444,10 @@ export const getUserProfileByUser = async (req, res) => {
 
     console.error(error)
 
-        return res.status(500).json({
-            status: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        })
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
   }
 };
