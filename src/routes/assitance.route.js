@@ -11,7 +11,7 @@ import { validateRoles } from "../middlewares/validateRols.js";
 const router = Router()
 
 //* PROFESOR
-router.get('/getAllAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'),getAllAssitance )
+router.get('/getAllAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_STUDENT'),getAllAssitance )
 
 //POST ASSISTENCIA
 router.post('/createAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), createAssitance)
