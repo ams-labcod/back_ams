@@ -10,6 +10,6 @@ const router = Router()
 
 router.post('/createPeriod', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'), createPeriod)
 
-router.get('/getAllPeriod', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'), getAllPeriod)
+router.get('/getAllPeriod', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER', 'ROL_STUDENT'), getAllPeriod)
 
 export default router
