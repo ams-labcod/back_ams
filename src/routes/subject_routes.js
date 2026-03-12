@@ -8,11 +8,11 @@ import { validateRoles } from "../middlewares/validateRols.js";
 
 const router = Router();
 
-router.post('/createSubject', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_PROFESOR'), createSubject)
+router.post('/createSubject', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER'), createSubject)
 
-router.get('/getSubjects', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_PROFESOR'),getAllCourseSubjects)
+router.get('/getSubjects', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER'),getAllCourseSubjects)
 
-router.get('/getOneSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_PROFESOR'),getCourseSubjectById)
+router.get('/getOneSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'),getCourseSubjectById)
 
 router.put('/updateSubject/:id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), updateCourseSubject)
 
