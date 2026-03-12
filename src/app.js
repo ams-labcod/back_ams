@@ -34,7 +34,7 @@ const app = express();
 
 const corsOptions = {
   origin: true, // acepta cualquier origen dinámicamente
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }
