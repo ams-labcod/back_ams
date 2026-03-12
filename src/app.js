@@ -24,11 +24,13 @@ import logrosRoutes from './routes/logros.routes.js'
 
 import studentRoute from './routes/student.route.js'
 
+import teachersRoute from './routes/teachers_route.js'
+
 
 import cors from 'cors';    
 
 //import endpoint
-import Routes from './routes/index.js'
+import Routes from './routes/index.js'   
 
 const app = express();
 
@@ -59,4 +61,5 @@ app.use('/', evaluationType)
 app.use('/', reportedRoute)
 app.use('/', logrosRoutes)  
 app.use('/', studentRoute)
+app.use('/', teachersRoute)
 export default app;
