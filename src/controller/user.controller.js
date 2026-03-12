@@ -185,8 +185,6 @@ export const create_person = async (req, res) => {
   }
 };
 
-
-
 export const login = async (req, res) => {
 
   const { usu_user, usu_password } = req.body;
@@ -203,9 +201,10 @@ export const login = async (req, res) => {
         p.PEO_LAST_NAME_1, 
         p.PEO_EMAIL,
         p.PEO_STATE,
+        p.PEO_TP_PERSON,
         u.USU_PASSWORD AS usu_password, 
         u.USU_ROLE AS usu_role,
-        t.TEA_PEO_ID -- Sacamos el ID del profesor (será null si es estudiante/admin)
+        t.TEA_PEO_ID 
       FROM AMS_PEOPLE p 
       INNER JOIN AMS_USERS u ON u.USU_PEO_ID = p.PEO_ID 
       LEFT JOIN AMS_TEACHERS t ON t.TEA_PEO_ID = p.PEO_ID 
@@ -250,7 +249,7 @@ export const login = async (req, res) => {
 
     //-- generamos el jwt
     const token = await generateJwt(peoId, usu_identification, usu_name1, usu_lastname1, usu_correo, usu_role, usu_state, tea_peo_id)
-    console.log('Token generado:', token)
+
     const response = {
       content: {
         token
