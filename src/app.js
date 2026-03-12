@@ -44,7 +44,6 @@ const corsOptions = {
 // Habilitar CORS (normal + preflight)
 app.use(cors(corsOptions))
 
-
 // Middlewares
 app.use(express.json());
 
