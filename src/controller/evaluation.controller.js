@@ -22,13 +22,13 @@ export const createEvaluation = async (req = request, res = response) => {
       [eva_cos_id, eva_per_id]
     );
 
-    const totalActual = currentSum[0].total_percent || 0;
+    // const totalActual = currentSum[0].total_percent || 0;
 
-    if ((totalActual + parseInt(eva_percent)) > 100) {
-      return res.status(400).json({
-        message: `No se puede crear la evaluación. El porcentaje acumulado actual es ${totalActual}%, y con esta evaluación superaría el 100%.`
-      });
-    }
+    // if ((totalActual + parseInt(eva_percent)) > 100) {
+    //   return res.status(400).json({
+    //     message: `No se puede crear la evaluación. El porcentaje acumulado actual es ${totalActual}%, y con esta evaluación superaría el 100%.`
+    //   });
+    // }
 
     // 2️⃣ Insertar la evaluación
     // Nota: El diagrama dice EVA_ID es INT, si no es autoincrementable deberás generar uno.
