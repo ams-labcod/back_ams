@@ -24,6 +24,8 @@ import logrosRoutes from './routes/logros.routes.js'
 
 import studentRoute from './routes/student.route.js'
 
+import teacherController from './routes/teacher.router.js'
+
 
 import cors from 'cors';    
 
@@ -42,7 +44,6 @@ const corsOptions = {
 // Habilitar CORS (normal + preflight)
 app.use(cors(corsOptions))
 
-
 // Middlewares
 app.use(express.json());
 
@@ -59,4 +60,5 @@ app.use('/', evaluationType)
 app.use('/', reportedRoute)
 app.use('/', logrosRoutes)  
 app.use('/', studentRoute)
+app.use('/', teacherController)
 export default app;
