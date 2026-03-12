@@ -267,7 +267,7 @@ export const getTeacherGradebook = async (req, res) => {
       content: {
         profesor: profesorInfo,
         periodo_consultado: per_id,
-        criterios_evaluacion: criterios.length > 0,
+        criterios_evaluacion: criterios.length > 0 ? criterios : "El docente no ha configurado los criterios (DBA, DB, etc.) para este periodo.",
         carga_academica: cargaAcademica
       },
       status: true,
