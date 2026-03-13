@@ -22,11 +22,13 @@ export const createEvaluation = async (req = request, res = response) => {
 
     // 2️⃣ Insertar la evaluación
     // Nota: El diagrama dice EVA_ID es INT, si no es autoincrementable deberás generar uno.
+    console.log(eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_id, '1')
     const [result] = await pool.query(
       'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_PER_ID, EVA_NAME, EVA_TP_TYPE, EVA_DATE, COU_NOTES_ID) VALUES (?,?, ?, ?, ?, ?)',
       [eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_id]
     );
 
+  console.log(eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_id, '2')
     return res.status(201).json({
       data: {
         content: null,
