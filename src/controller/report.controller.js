@@ -20,7 +20,6 @@ export const getConsolidatedByCourse = async (req, res) => {
         CONCAT(e.EST_NAME, ' ', e.EST_LAST_NAME) AS ESTUDIANTE,
         cs.COS_SUBJECT_NAME AS MATERIA,
         ev.EVA_NAME AS ACTIVIDAD,
-        ev.EVA_PERCENT AS PORCENTAJE,
         n.NOT_VALUE AS NOTA
       FROM AMS_COURSES c
       INNER JOIN AMS_ESTUDENTS e ON c.COU_ID = e.COU_ID
