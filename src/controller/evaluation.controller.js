@@ -13,7 +13,7 @@ export const createEvaluation = async (req = request, res = response) => {
       eva_tp_type,
       eva_percent,
       eva_date,
-      cou_notes_
+      cou_notes_id
     } = req.body;
 
     const [validatePeriod] = pool.query('select PER_ID from AMS_PERIOD WHERE PER_ID = ?', [eva_per_id])
@@ -24,7 +24,7 @@ export const createEvaluation = async (req = request, res = response) => {
     // Nota: El diagrama dice EVA_ID es INT, si no es autoincrementable deberás generar uno.
     const [result] = await pool.query(
       'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_PER_ID, EVA_NAME, EVA_TP_TYPE, EVA_DATE, COU_NOTES_ID) VALUES (?,?, ?, ?, ?, ?)',
-      [eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_]
+      [eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_id]
     );
 
     return res.status(201).json({
