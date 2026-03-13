@@ -8,12 +8,16 @@ export const createEvaluation = async (req = request, res = response) => {
   try {
     const {
       eva_cos_id,
-      // eva_per_id,
+      eva_per_id,
       eva_name,
       eva_tp_type,
-      // eva_percent,
+      eva_percent,
       eva_date
     } = req.body;
+
+        // Convertir valores vacíos a NULL
+    const evaPerIdValue = eva_per_id || null;
+    const evaPercentValue = eva_percent || null;
 
     // 1️⃣ Lógica de Negocio: Validar que los porcentajes no sumen más de 100%
     // Buscamos cuánto porcentaje ya se ha asignado a esta materia en este periodo
@@ -33,8 +37,8 @@ export const createEvaluation = async (req = request, res = response) => {
     // 2️⃣ Insertar la evaluación
     // Nota: El diagrama dice EVA_ID es INT, si no es autoincrementable deberás generar uno.
     const [result] = await pool.query(
-      'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_NAME, EVA_TP_TYPE, EVA_DATE) VALUES (?, ?, ?, ?, ?, ?)',
-      [eva_cos_id, eva_name, eva_tp_type, eva_date]
+      'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_PER_ID, EVA_NAME, EVA_TP_TYPE, EVA_PERCENT, EVA_DATE) VALUES (?, ?, ?, ?, ?, ?)',
+      [eva_cos_id, evaPerIdValue, eva_name, eva_tp_type, evaPercentValue, eva_date]
     );
 
     return res.status(201).json({
