@@ -12,33 +12,19 @@ export const createEvaluation = async (req = request, res = response) => {
       eva_name,
       eva_tp_type,
       eva_percent,
-      eva_date
+      eva_date,
+      cou_notes_id
     } = req.body;
 
-        // Convertir valores vacíos a NULL
-    const evaPerIdValue = eva_per_id || null;
-    const evaPercentValue = eva_percent || null;
+    const [validatePeriod] = pool.query('select PER_ID from AMS_PERIOD WHERE PER_ID = ?', [eva_per_id])
 
-    // 1️⃣ Lógica de Negocio: Validar que los porcentajes no sumen más de 100%
-    // Buscamos cuánto porcentaje ya se ha asignado a esta materia en este periodo
-    // const [currentSum] = await pool.query(
-    //   'SELECT SUM(EVA_PERCENT) AS total_percent FROM AMS_EVALUATION WHERE EVA_COS_ID = ? AND EVA_PER_ID = ?',
-    //   [eva_cos_id, eva_per_id]
-    // );
-
-    // const totalActual = currentSum[0].total_percent || 0;
-
-    // if ((totalActual + parseInt(eva_percent)) > 100) {
-    //   return res.status(400).json({
-    //     message: `No se puede crear la evaluación. El porcentaje acumulado actual es ${totalActual}%, y con esta evaluación superaría el 100%.`
-    //   });
-    // }
+    if(validatePeriod.length === 0) return res.status(404).json({errorMessage: 'El periodo no existe'})
 
     // 2️⃣ Insertar la evaluación
     // Nota: El diagrama dice EVA_ID es INT, si no es autoincrementable deberás generar uno.
     const [result] = await pool.query(
-      'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_PER_ID, EVA_NAME, EVA_TP_TYPE, EVA_PERCENT, EVA_DATE) VALUES (?, ?, ?, ?, ?, ?)',
-      [eva_cos_id, evaPerIdValue, eva_name, eva_tp_type, evaPercentValue, eva_date]
+      'INSERT INTO AMS_EVALUATION (EVA_COS_ID, EVA_PER_ID, EVA_NAME, EVA_TP_TYPE, EVA_DATE, COU_NOTES_ID) VALUES (?,?, ?, ?, ?, ?)',
+      [eva_cos_id, eva_per_id, eva_name, eva_tp_type, eva_percent, eva_date, cou_notes_id]
     );
 
     return res.status(201).json({
