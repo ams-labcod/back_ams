@@ -18,7 +18,7 @@ router.get('/consolidated/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_AD
 router.get(
   '/coursesDirectors/all', 
   verifyJwt, 
-  validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), 
+  validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER'), 
   getAllCourseDirectors
 );
 
