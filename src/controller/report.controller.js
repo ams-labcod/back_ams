@@ -148,36 +148,190 @@ export const getAllCourseDirectors = async (req, res) => {
   }
 };
 
+// //* Planilla del profesor
+// export const getTeacherGradebook = async (req, res) => {
+//   try {
+//     // 1️⃣ ID del profesor desde el token
+//     const tea_peo_id = req.user.tea_peo_id;
+    
+//     // 2️⃣ El periodo debe venir por la URL (Ej: /teacher/gradebook?per_id=1)
+//     const { per_id } = req.query;
 
+//     const [validatePeriod] = await pool.query('SELECT PER_ID FROM AMS_PERIOD WHERE PER_ID = ? ', per_id)
 
-//* Planilla del profesor
+//     if(validatePeriod.length === 0) return res.status(400).json({errorMessage: 'El periodo ingesado no existe'})
+
+//     if (!tea_peo_id) {
+//       console.log(tea_peo_id)
+//       return res.status(403).json({ message: 'Acceso denegado: Perfil docente no encontrado.' });
+//     }
+
+//     if (!per_id) {
+//       return res.status(400).json({ message: 'Debe especificar el periodo académico (?per_id=X)' });
+//     }
+
+//     // 🌟 NUEVO: Obtenemos los criterios de evaluación que el profe configuró para este periodo
+//     const [criterios] = await pool.query(
+//       'SELECT COU_NOT_CRITERIA AS criterio, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
+//       [per_id, tea_peo_id]
+//     );
+
+//     // 3️⃣ La Súper Consulta SQL con LEFT JOINs estratégicos
+//     const [rows] = await pool.query(
+//       `SELECT 
+//         t.TEA_NAME, 
+//         t.TEA_LAST_NAME,
+//         c.COU_ID, 
+//         c.COU_LEVEL, 
+//         c.COU_NAME_TEACH AS CURSO,
+//         cs.COS_ID, 
+//         cs.COS_SUBJECT_NAME AS ASIGNATURA,
+//         e.EST_ID, 
+//         e.EST_IDENTIFICATION, 
+//         e.EST_NAME, 
+//         e.EST_LAST_NAME,
+//         ev.EVA_ID, 
+//         ev.EVA_NAME AS ACTIVIDAD, 
+//         ev.EVA_PERCENT,
+//         n.NOT_VALUE,
+//         cn.ID_cou_notes AS Id_notas_del_curso,
+//         cn.PER_ID,
+//         cn.cou_not_criteria AS criterio,
+//         cn.cou_not_percent AS porcentaje_criterio,
+//         cn.TEA_ID
+//       FROM AMS_COURSE_SUBJECT cs
+//       INNER JOIN AMS_TEACHERS t ON cs.TEA_PEO_ID = t.TEA_PEO_ID
+//       INNER JOIN AMS_COURSES c ON cs.COU_ID = c.COU_ID
+//       -- Hacemos LEFT JOIN a los estudiantes por si el curso aún no tiene matriculados
+//       LEFT JOIN AMS_ESTUDENTS e ON c.COU_ID = e.COU_ID
+//       -- LEFT JOIN a evaluaciones filtrando POR EL PERIODO SOLICITADO
+//       LEFT JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID AND ev.EVA_PER_ID = ?
+//       -- LEFT JOIN a las notas por si el estudiante aún no ha sido calificado
+//       LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
+//       LEFT JOIN AMS_COURSE_NOTES cn 
+//       ON cn.PER_ID = ev.EVA_PER_ID 
+//       AND cn.TEA_ID = t.TEA_PEO_ID
+//       WHERE cs.TEA_PEO_ID = ? AND cs.COS_STATE = 'A'
+//       ORDER BY c.COU_LEVEL, c.COU_NAME_TEACH, cs.COS_SUBJECT_NAME, e.EST_LAST_NAME, ev.EVA_DATE ASC`,
+//       [per_id, tea_peo_id]
+//     );
+
+//     if (rows.length === 0) {
+//       return res.status(404).json({ message: 'No se encontró carga académica para este docente.' });
+//     }
+
+//     // 4️⃣ Transformar la data plana de SQL a un JSON estructurado
+//     const groupedData = {};
+//     const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME}`;
+
+//     rows.forEach(row => {
+//       // Agrupamos por Curso + Materia
+//       const courseSubjKey = `${row.COU_ID}-${row.COS_ID}`;
+//       console.log(groupedData)  
+
+//       if (!groupedData[courseSubjKey]) {
+//         groupedData[courseSubjKey] = {
+//           id_curso: row.COU_ID,
+//           nivel: row.COU_LEVEL,
+//           curso: row.CURSO,
+//           id_materia: row.COS_ID,
+//           materia: row.ASIGNATURA,
+//           estudiantes: {},
+//           criterios: {}
+//         };
+//       }
+
+//       // Agrupamos los estudiantes dentro de esa materia
+//       if (row.EST_ID) {
+//         if (!groupedData[courseSubjKey].estudiantes[row.EST_ID]) {
+//           groupedData[courseSubjKey].estudiantes[row.EST_ID] = {
+//             id_estudiante: row.EST_ID,
+//             identificacion: row.EST_IDENTIFICATION,
+//             nombre: row.EST_NAME,
+//             apellido: row.EST_LAST_NAME,
+//             notas: []
+//           };
+//         }
+
+//         // Si hay una evaluación (actividad) en este periodo, la metemos al estudiante
+//         if (row.EVA_ID) {
+//           groupedData[courseSubjKey].estudiantes[row.EST_ID].notas.push({
+//             id_evaluacion: row.EVA_ID,
+//             actividad: row.ACTIVIDAD,
+//             criterio: row.criterio, 
+//             porcentaje: row.EVA_PERCENT,
+//             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null
+//           });
+//         }
+//       }
+//     });
+
+//     // 5️⃣ Convertimos los objetos temporales en arreglos limpios para el Frontend
+//     const cargaAcademica = Object.values(groupedData).map(course => ({
+//       ...course,
+//       estudiantes: Object.values(course.estudiantes)
+//     }));
+
+//     // 6️⃣ Respuesta Final
+//     const response = {
+//       content: {
+//         profesor: profesorInfo,
+//         periodo_consultado: per_id,
+//         criterios_evaluacion: criterios.length > 0 ? criterios : "El docente no ha configurado los criterios (DBA, DB, etc.) para este periodo.",
+//         carga_academica: cargaAcademica
+//       },
+//       status: true,
+//       message: 'Planilla de calificaciones obtenida correctamente'
+//     };
+
+//     return res.status(200).json({ data: response });
+
+//   } catch (error) {
+//     console.error('❌ ERROR OBTENIENDO PLANILLA DEL DOCENTE:', error);
+//     return res.status(500).json({
+//       status: false,
+//       message: 'Error interno del servidor',
+//       error: error.message
+//     });
+//   }
+// };
+
+//* Planilla académica general
 export const getTeacherGradebook = async (req, res) => {
   try {
-    // 1️⃣ ID del profesor desde el token
-    const tea_peo_id = req.user.tea_peo_id;
-    
-    // 2️⃣ El periodo debe venir por la URL (Ej: /teacher/gradebook?per_id=1)
+
+    // 1️⃣ Periodo desde la URL
     const { per_id } = req.query;
 
-    const [validatePeriod] = await pool.query('SELECT PER_ID FROM AMS_PERIOD WHERE PER_ID = ? ', per_id)
-
-    if(validatePeriod.length === 0) return res.status(400).json({errorMessage: 'El periodo ingesado no existe'})
-
-    if (!tea_peo_id) {
-      return res.status(403).json({ message: 'Acceso denegado: Perfil docente no encontrado.' });
-    }
-
     if (!per_id) {
-      return res.status(400).json({ message: 'Debe especificar el periodo académico (?per_id=X)' });
+      return res.status(400).json({
+        message: 'Debe especificar el periodo académico (?per_id=X)'
+      });
     }
 
-    // 🌟 NUEVO: Obtenemos los criterios de evaluación que el profe configuró para este periodo
-    const [criterios] = await pool.query(
-      'SELECT COU_NOT_CRITERIA AS criterio, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
-      [per_id, tea_peo_id]
+    // 2️⃣ Validar periodo
+    const [validatePeriod] = await pool.query(
+      'SELECT PER_ID FROM AMS_PERIOD WHERE PER_ID = ?',
+      [per_id]
     );
 
-    // 3️⃣ La Súper Consulta SQL con LEFT JOINs estratégicos
+    if (validatePeriod.length === 0) {
+      return res.status(400).json({
+        errorMessage: 'El periodo ingresado no existe'
+      });
+    }
+
+    // 3️⃣ Obtener criterios del periodo
+    const [criterios] = await pool.query(
+      `SELECT 
+        COU_NOT_CRITERIA AS criterio,
+        COU_NOT_PERCENT AS porcentaje
+      FROM AMS_COURSE_NOTES
+      WHERE PER_ID = ?`,
+      [per_id]
+    );
+
+    // 4️⃣ Consulta principal
     const [rows] = await pool.query(
       `SELECT 
         t.TEA_NAME, 
@@ -195,29 +349,42 @@ export const getTeacherGradebook = async (req, res) => {
         ev.EVA_NAME AS ACTIVIDAD, 
         n.NOT_VALUE
       FROM AMS_COURSE_SUBJECT cs
-      INNER JOIN AMS_TEACHERS t ON cs.TEA_PEO_ID = t.TEA_PEO_ID
-      INNER JOIN AMS_COURSES c ON cs.COU_ID = c.COU_ID
-      -- Hacemos LEFT JOIN a los estudiantes por si el curso aún no tiene matriculados
-      LEFT JOIN AMS_ESTUDENTS e ON c.COU_ID = e.COU_ID
-      -- LEFT JOIN a evaluaciones filtrando POR EL PERIODO SOLICITADO
-      LEFT JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID AND ev.EVA_PER_ID = ?
-      -- LEFT JOIN a las notas por si el estudiante aún no ha sido calificado
-      LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
-      WHERE cs.TEA_PEO_ID = ? AND cs.COS_STATE = 'A'
-      ORDER BY c.COU_LEVEL, c.COU_NAME_TEACH, cs.COS_SUBJECT_NAME, e.EST_LAST_NAME, ev.EVA_DATE ASC`,
-      [per_id, tea_peo_id]
+      INNER JOIN AMS_TEACHERS t 
+        ON cs.TEA_PEO_ID = t.TEA_PEO_ID
+      INNER JOIN AMS_COURSES c 
+        ON cs.COU_ID = c.COU_ID
+      LEFT JOIN AMS_ESTUDENTS e 
+        ON c.COU_ID = e.COU_ID
+      LEFT JOIN AMS_EVALUATION ev 
+        ON cs.COS_ID = ev.EVA_COS_ID 
+        AND ev.EVA_PER_ID = ?
+      LEFT JOIN AMS_NOTES n 
+        ON ev.EVA_ID = n.EVA_ID 
+        AND e.EST_ID = n.NOT_EST_ID
+      LEFT JOIN AMS_COURSE_NOTES cn 
+        ON cn.PER_ID = ev.EVA_PER_ID
+      WHERE cs.COS_STATE = 'A'
+      ORDER BY 
+        c.COU_LEVEL,
+        c.COU_NAME_TEACH,
+        cs.COS_SUBJECT_NAME,
+        e.EST_LAST_NAME,
+        ev.EVA_DATE ASC`,
+      [per_id]
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ message: 'No se encontró carga académica para este docente.' });
+      return res.status(404).json({
+        message: 'No se encontró información académica para este periodo.'
+      });
     }
 
-    // 4️⃣ Transformar la data plana de SQL a un JSON estructurado
+    // 5️⃣ Transformar SQL plano a JSON
     const groupedData = {};
     const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME}`;
 
     rows.forEach(row => {
-      // Agrupamos por Curso + Materia
+
       const courseSubjKey = `${row.COU_ID}-${row.COS_ID}`;
 
       if (!groupedData[courseSubjKey]) {
@@ -231,8 +398,8 @@ export const getTeacherGradebook = async (req, res) => {
         };
       }
 
-      // Agrupamos los estudiantes dentro de esa materia
       if (row.EST_ID) {
+
         if (!groupedData[courseSubjKey].estudiantes[row.EST_ID]) {
           groupedData[courseSubjKey].estudiantes[row.EST_ID] = {
             id_estudiante: row.EST_ID,
@@ -243,30 +410,37 @@ export const getTeacherGradebook = async (req, res) => {
           };
         }
 
-        // Si hay una evaluación (actividad) en este periodo, la metemos al estudiante
         if (row.EVA_ID) {
+
           groupedData[courseSubjKey].estudiantes[row.EST_ID].notas.push({
             id_evaluacion: row.EVA_ID,
             actividad: row.ACTIVIDAD,
+            criterio: row.criterio,
             porcentaje: row.EVA_PERCENT,
-            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null // Si no tiene nota, viaja como null
+            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null
           });
+
         }
+
       }
+
     });
 
-    // 5️⃣ Convertimos los objetos temporales en arreglos limpios para el Frontend
+    // 6️⃣ Convertir objetos a arrays
     const cargaAcademica = Object.values(groupedData).map(course => ({
       ...course,
       estudiantes: Object.values(course.estudiantes)
     }));
 
-    // 6️⃣ Respuesta Final
+    // 7️⃣ Respuesta final
     const response = {
       content: {
         profesor: profesorInfo,
         periodo_consultado: per_id,
-        criterios_evaluacion: criterios.length > 0 ? criterios : "El docente no ha configurado los criterios (DBA, DB, etc.) para este periodo.",
+        criterios_evaluacion:
+          criterios.length > 0
+            ? criterios
+            : "No se han configurado criterios para este periodo.",
         carga_academica: cargaAcademica
       },
       status: true,
@@ -276,11 +450,14 @@ export const getTeacherGradebook = async (req, res) => {
     return res.status(200).json({ data: response });
 
   } catch (error) {
-    console.error('❌ ERROR OBTENIENDO PLANILLA DEL DOCENTE:', error);
+
+    console.error('❌ ERROR OBTENIENDO PLANILLA:', error);
+
     return res.status(500).json({
       status: false,
       message: 'Error interno del servidor',
       error: error.message
     });
+
   }
 };

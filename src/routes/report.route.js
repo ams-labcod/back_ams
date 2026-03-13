@@ -22,6 +22,6 @@ router.get(
   getAllCourseDirectors
 );
 
-router.get('/teacher/gradebook', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO', 'ROL_ADMIN'), getTeacherGradebook)
+router.get('/teacher/gradebook', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO', 'ROL_ADMIN', 'ROL_STUDENT'), getTeacherGradebook)
 
 export default router
