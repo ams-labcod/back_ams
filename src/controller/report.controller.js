@@ -309,7 +309,7 @@ export const getTeacherGradebook = async (req, res) => {
       });
     }
 
-    // 2️⃣ Validar que el periodo exista
+    // 2️⃣ Validar periodo
     const [validatePeriod] = await pool.query(
       'SELECT PER_ID FROM AMS_PERIOD WHERE PER_ID = ?',
       [per_id]
@@ -321,7 +321,17 @@ export const getTeacherGradebook = async (req, res) => {
       });
     }
 
-    // 3️⃣ Consulta principal
+    // 3️⃣ Obtener criterios del periodo
+    const [criterios] = await pool.query(
+      `SELECT 
+        COU_NOT_CRITERIA AS criterio,
+        COU_NOT_PERCENT AS porcentaje
+      FROM AMS_COURSE_NOTES
+      WHERE PER_ID = ?`,
+      [per_id]
+    );
+
+    // 4️⃣ Consulta principal
     const [rows] = await pool.query(
       `SELECT 
         t.TEA_NAME, 
@@ -372,7 +382,7 @@ export const getTeacherGradebook = async (req, res) => {
       });
     }
 
-    // 4️⃣ Transformar SQL plano a JSON estructurado
+    // 5️⃣ Transformar SQL plano a JSON
     const groupedData = {};
     const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME}`;
 
@@ -419,17 +429,21 @@ export const getTeacherGradebook = async (req, res) => {
 
     });
 
-    // 5️⃣ Convertir objetos a arrays
+    // 6️⃣ Convertir objetos a arrays
     const cargaAcademica = Object.values(groupedData).map(course => ({
       ...course,
       estudiantes: Object.values(course.estudiantes)
     }));
 
-    // 6️⃣ Respuesta final
+    // 7️⃣ Respuesta final
     const response = {
       content: {
         profesor: profesorInfo,
         periodo_consultado: per_id,
+        criterios_evaluacion:
+          criterios.length > 0
+            ? criterios
+            : "No se han configurado criterios para este periodo.",
         carga_academica: cargaAcademica
       },
       status: true,
