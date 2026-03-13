@@ -16,7 +16,7 @@ export const createEvaluation = async (req = request, res = response) => {
       cou_notes_id
     } = req.body;
 
-    const [validatePeriod] = pool.query('select PER_ID from AMS_PERIOD WHERE PER_ID = ?', [eva_per_id])
+    const [validatePeriod] = await pool.query('SELECT PER_ID from AMS_PERIOD WHERE PER_ID = ?', [eva_per_id])
 
     if(validatePeriod.length === 0) return res.status(404).json({errorMessage: 'El periodo no existe'})
 
