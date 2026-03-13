@@ -194,7 +194,12 @@ export const getTeacherGradebook = async (req, res) => {
         ev.EVA_ID, 
         ev.EVA_NAME AS ACTIVIDAD, 
         ev.EVA_PERCENT,
-        n.NOT_VALUE
+        n.NOT_VALUE,
+        cn.ID_cou_notes AS Id_notas_del_curso,
+        cn.PER_ID,
+        cn.cou_not_criteria AS criterio,
+        cn.cou_not_percent AS porcentaje_criterio,
+        cn.TEA_ID
       FROM AMS_COURSE_SUBJECT cs
       INNER JOIN AMS_TEACHERS t ON cs.TEA_PEO_ID = t.TEA_PEO_ID
       INNER JOIN AMS_COURSES c ON cs.COU_ID = c.COU_ID
@@ -204,6 +209,9 @@ export const getTeacherGradebook = async (req, res) => {
       LEFT JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID AND ev.EVA_PER_ID = ?
       -- LEFT JOIN a las notas por si el estudiante aún no ha sido calificado
       LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
+      LEFT JOIN AMS_COURSE_NOTES cn 
+      ON cn.PER_ID = ev.EVA_PER_ID 
+      AND cn.TEA_ID = t.TEA_PEO_ID
       WHERE cs.TEA_PEO_ID = ? AND cs.COS_STATE = 'A'
       ORDER BY c.COU_LEVEL, c.COU_NAME_TEACH, cs.COS_SUBJECT_NAME, e.EST_LAST_NAME, ev.EVA_DATE ASC`,
       [per_id, tea_peo_id]
@@ -220,6 +228,7 @@ export const getTeacherGradebook = async (req, res) => {
     rows.forEach(row => {
       // Agrupamos por Curso + Materia
       const courseSubjKey = `${row.COU_ID}-${row.COS_ID}`;
+      console.log(groupedData)  
 
       if (!groupedData[courseSubjKey]) {
         groupedData[courseSubjKey] = {
@@ -228,7 +237,8 @@ export const getTeacherGradebook = async (req, res) => {
           curso: row.CURSO,
           id_materia: row.COS_ID,
           materia: row.ASIGNATURA,
-          estudiantes: {}
+          estudiantes: {},
+          criterios: {}
         };
       }
 
