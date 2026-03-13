@@ -171,6 +171,12 @@ export const getTeacherGradebook = async (req, res) => {
       return res.status(400).json({ message: 'Debe especificar el periodo académico (?per_id=X)' });
     }
 
+    // 🌟 NUEVO: Obtenemos los criterios de evaluación que el profe configuró para este periodo
+    const [criterios] = await pool.query(
+      'SELECT COU_NOT_CRITERIA AS criterio, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
+      [per_id, tea_peo_id]
+    );
+
     // 3️⃣ La Súper Consulta SQL con LEFT JOINs estratégicos
     const [rows] = await pool.query(
       `SELECT 
@@ -271,6 +277,7 @@ export const getTeacherGradebook = async (req, res) => {
       content: {
         profesor: profesorInfo,
         periodo_consultado: per_id,
+        criterios_evaluacion: criterios.length > 0 ? criterios : "El docente no ha configurado los criterios (DBA, DB, etc.) para este periodo.",
         carga_academica: cargaAcademica
       },
       status: true,
