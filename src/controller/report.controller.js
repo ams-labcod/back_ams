@@ -148,8 +148,6 @@ export const getAllCourseDirectors = async (req, res) => {
   }
 };
 
-
-
 //* Planilla del profesor
 export const getTeacherGradebook = async (req, res) => {
   try {
@@ -164,6 +162,7 @@ export const getTeacherGradebook = async (req, res) => {
     if(validatePeriod.length === 0) return res.status(400).json({errorMessage: 'El periodo ingesado no existe'})
 
     if (!tea_peo_id) {
+      console.log(tea_peo_id)
       return res.status(403).json({ message: 'Acceso denegado: Perfil docente no encontrado.' });
     }
 
@@ -259,8 +258,9 @@ export const getTeacherGradebook = async (req, res) => {
           groupedData[courseSubjKey].estudiantes[row.EST_ID].notas.push({
             id_evaluacion: row.EVA_ID,
             actividad: row.ACTIVIDAD,
+            criterio: row.criterio, 
             porcentaje: row.EVA_PERCENT,
-            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null // Si no tiene nota, viaja como null
+            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null
           });
         }
       }

@@ -11,7 +11,7 @@ export const createEvaluation = async (req = request, res = response) => {
       eva_per_id,
       eva_name,
       eva_tp_type,
-      eva_percent,
+      // eva_percent,
       eva_date
     } = req.body;
 
