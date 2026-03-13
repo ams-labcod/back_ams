@@ -193,7 +193,6 @@ export const getTeacherGradebook = async (req, res) => {
         e.EST_LAST_NAME,
         ev.EVA_ID, 
         ev.EVA_NAME AS ACTIVIDAD, 
-        ev.EVA_PERCENT,
         n.NOT_VALUE
       FROM AMS_COURSE_SUBJECT cs
       INNER JOIN AMS_TEACHERS t ON cs.TEA_PEO_ID = t.TEA_PEO_ID
