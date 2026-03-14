@@ -12,7 +12,6 @@ export const getAllNotes = async (req = request, res = response) => {
         n.NOT_VALUE, 
         n.NOT_DATE,
         ev.EVA_NAME, 
-        ev.EVA_PERCENT,
         cs.COS_SUBJECT_NAME,
         c.COU_LEVEL, 
         c.COU_NAME_TEACH,
