@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import { getAllTeachers } from "../controller/teachers.controller.js";
+import { getAllCourseNotes, getAllTeachers } from "../controller/teachers.controller.js";
 
 import { getCourseCriteria } from "../controller/teachers.controller.js";
 
@@ -29,4 +29,7 @@ router.post(
   saveCourseCriteria
 );
 
+
+//* obtener todos los criterios
+router.get('/teacher/getAllCriteria', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_ADMIN'),getAllCourseNotes)
 export default router;
