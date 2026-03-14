@@ -1,15 +1,15 @@
 import { pool } from '../config/db.js'
 
 export const getConsolidatedByCourse = async (req, res) => {
-    try {
-        // Obtenemos el ID del curso que queremos buscar
-        const { cou_id } = req.params;
+  try {
+    // Obtenemos el ID del curso que queremos buscar
+    const { cou_id } = req.params;
 
-        // Opcional: Podrías recibir el periodo por query para filtrar más (?per_id=1)
-        const { per_id } = req.query;
+    // Opcional: Podrías recibir el periodo por query para filtrar más (?per_id=1)
+    const { per_id } = req.query;
 
-        // Construimos la consulta base
-        let sqlQuery = `
+    // Construimos la consulta base
+    let sqlQuery = `
       SELECT 
         c.COU_ID as CursoID,
         c.COU_LEVEL as  CursoNivel,
@@ -30,88 +30,88 @@ export const getConsolidatedByCourse = async (req, res) => {
       WHERE c.COU_ID = ?
     `;
 
-        const queryParams = [cou_id];
+    const queryParams = [cou_id];
 
-        // Si además enviaron un periodo específico, lo agregamos al filtro
-        if (per_id) {
-            sqlQuery += ` AND p.PER_ID = ?`;
-            queryParams.push(per_id);
-        }
-
-        // Ordenamos para que el reporte sea legible (Por periodo, luego por estudiante, luego por materia)
-        sqlQuery += ` ORDER BY p.PER_ID ASC, e.EST_LAST_NAME ASC, cs.COS_SUBJECT_NAME ASC`;
-
-        const [consolidado] = await pool.query(sqlQuery, queryParams);
-
-        if (consolidado.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron datos para este curso. Verifica que tenga estudiantes, materias y evaluaciones creadas.' });
-        }
-
-        const response = {
-            content: consolidado,
-            status: true,
-            message: 'Consolidado generado exitosamente'
-        };
-
-        return res.status(200).json({ data: response });
-
-    } catch (error) {
-
-        console.error(error)
-
-        return res.status(500).json({
-            status: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        })
+    // Si además enviaron un periodo específico, lo agregamos al filtro
+    if (per_id) {
+      sqlQuery += ` AND p.PER_ID = ?`;
+      queryParams.push(per_id);
     }
+
+    // Ordenamos para que el reporte sea legible (Por periodo, luego por estudiante, luego por materia)
+    sqlQuery += ` ORDER BY p.PER_ID ASC, e.EST_LAST_NAME ASC, cs.COS_SUBJECT_NAME ASC`;
+
+    const [consolidado] = await pool.query(sqlQuery, queryParams);
+
+    if (consolidado.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron datos para este curso. Verifica que tenga estudiantes, materias y evaluaciones creadas.' });
+    }
+
+    const response = {
+      content: consolidado,
+      status: true,
+      message: 'Consolidado generado exitosamente'
+    };
+
+    return res.status(200).json({ data: response });
+
+  } catch (error) {
+
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
 };
 
 
 export const assignGroupDirector = async (req, res) => {
 
-    try {
-        // Recibimos el ID del profesor por los parámetros de la URL
-        const { tea_peo_id } = req.params;
+  try {
+    // Recibimos el ID del profesor por los parámetros de la URL
+    const { tea_peo_id } = req.params;
 
-        // Recibimos el ID del curso que va a dirigir por el body
-        const { cou_id } = req.body;
+    // Recibimos el ID del curso que va a dirigir por el body
+    const { cou_id } = req.body;
 
-        //  Validar si el curso realmente existe
-        const [course] = await pool.query('SELECT COU_ID FROM AMS_COURSES WHERE COU_ID = ?', [cou_id]);
+    //  Validar si el curso realmente existe
+    const [course] = await pool.query('SELECT COU_ID FROM AMS_COURSES WHERE COU_ID = ?', [cou_id]);
 
-        if (course.length === 0) {
-            return res.status(404).json({ message: 'El curso especificado no existe en el sistema' });
-        }
-
-        // se asigna profesor como director de grupo
-        const [result] = await pool.query(
-            'UPDATE AMS_TEACHERS SET TEA_GROUP_DIR = ? WHERE TEA_PEO_ID = ?',
-            [cou_id, tea_peo_id]
-        );
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'El docente no fue encontrado' });
-        }
-
-        const response = {
-            content: null,
-            status: true,
-            message: 'Director de grupo asignado exitosamente'
-        };
-
-        return res.status(200).json({ data: response });
-
-    } catch (error) {
-
-        console.error(error)
-
-        return res.status(500).json({
-            status: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        })
+    if (course.length === 0) {
+      return res.status(404).json({ message: 'El curso especificado no existe en el sistema' });
     }
+
+    // se asigna profesor como director de grupo
+    const [result] = await pool.query(
+      'UPDATE AMS_TEACHERS SET TEA_GROUP_DIR = ? WHERE TEA_PEO_ID = ?',
+      [cou_id, tea_peo_id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'El docente no fue encontrado' });
+    }
+
+    const response = {
+      content: null,
+      status: true,
+      message: 'Director de grupo asignado exitosamente'
+    };
+
+    return res.status(200).json({ data: response });
+
+  } catch (error) {
+
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
 };
 
 
@@ -152,7 +152,7 @@ export const getAllCourseDirectors = async (req, res) => {
 //   try {
 //     // 1️⃣ ID del profesor desde el token
 //     const tea_peo_id = req.user.tea_peo_id;
-    
+
 //     // 2️⃣ El periodo debe venir por la URL (Ej: /teacher/gradebook?per_id=1)
 //     const { per_id } = req.query;
 
@@ -346,6 +346,9 @@ export const getTeacherGradebook = async (req, res) => {
         e.EST_LAST_NAME,
         ev.EVA_ID, 
         ev.EVA_NAME AS ACTIVIDAD, 
+        cn.ID_COU_NOTES AS CRITERIO_ID,
+        cn.COU_NOT_CRITERIA AS CRITERIO,
+        cn.COU_NOT_PERCENT AS PORCENTAJE,
         n.NOT_VALUE
       FROM AMS_COURSE_SUBJECT cs
       INNER JOIN AMS_TEACHERS t 
@@ -360,8 +363,8 @@ export const getTeacherGradebook = async (req, res) => {
       LEFT JOIN AMS_NOTES n 
         ON ev.EVA_ID = n.EVA_ID 
         AND e.EST_ID = n.NOT_EST_ID
-      LEFT JOIN AMS_COURSE_NOTES cn 
-        ON cn.PER_ID = ev.EVA_PER_ID
+  LEFT JOIN AMS_COURSE_NOTES cn
+  ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
       WHERE cs.COS_STATE = 'A'
       ORDER BY 
         c.COU_LEVEL,
@@ -414,8 +417,8 @@ export const getTeacherGradebook = async (req, res) => {
           groupedData[courseSubjKey].estudiantes[row.EST_ID].notas.push({
             id_evaluacion: row.EVA_ID,
             actividad: row.ACTIVIDAD,
-            criterio: row.criterio,
-            porcentaje: row.EVA_PERCENT,
+            criterio: row.CRITERIO,
+            porcentaje: row.PORCENTAJE,
             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null
           });
 
