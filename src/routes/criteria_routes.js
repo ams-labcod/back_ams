@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { check } from 'express-validator';
 
-import { create_criteria } from '../controller/criteria.controller.js';
+import { create_criteria, getAllCriteria } from '../controller/criteria.controller.js';
 
 import { validations } from '../middlewares/validations.js';
 
@@ -78,5 +78,7 @@ router.post(
   validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),
   create_criteria
 );
+
+router.get('/getAllCriteria', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCriteria)
 
 export default router;

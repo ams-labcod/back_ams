@@ -78,3 +78,37 @@ export const create_criteria = async (req = request, res = response) => {
     if (connection) connection.release();
   }
 };
+
+export const getAllCriteria = async (req,res) => {
+
+   try {
+
+        const [data] = await pool.query('SELECT  * FROM  AMS_CRITERIA')
+
+        if (data.length === 0) return res.status(404).json({ errorMessage: 'No hay criterios creados' })
+
+        const result = {
+            content: data,
+            status: true,
+            message: 'Lista de todos los criterios'
+        }
+
+        const Data = {
+            data: data
+        }
+
+        return res.status(200).json(Data)
+
+
+    } catch (error) {
+
+        console.log(error)
+
+        return res.status(500).json({
+            status: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        })
+
+    }
+}
