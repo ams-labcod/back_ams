@@ -62,7 +62,7 @@ export const getStudentSubjects = async (req, res) => {
 export const getAllStudents = async (req, res) => {
   try {
     // Consultamos todos los cursos
-    const [student] = await pool.query('SELECT * FROM AMS_STUDENTS');
+    const [student] = await pool.query('SELECT * FROM AMS_ESTUDENTS');
 
     const response = {
       content: student,
