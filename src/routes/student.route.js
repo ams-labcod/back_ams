@@ -3,7 +3,7 @@ import { Router } from "express";
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
 import { validateRoles } from "../middlewares/validateRols.js";
-import { getStudentSubjects } from "../controller/student.controller.js";
+import { getAllStudents, getStudentSubjects } from "../controller/student.controller.js";
 
 
 const router = Router()
@@ -14,5 +14,7 @@ router.get(
   validateRoles('ROL_STUDENT', 'ROL_ADMIN','ROL_ADMINISTRATIVO'), 
   getStudentSubjects
 );
+
+router.get('/getAllStudents', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMIN', 'ROL_ADMINISTRATIVO'), getAllStudents)
 
 export default router

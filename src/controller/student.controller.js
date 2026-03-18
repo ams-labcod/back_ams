@@ -57,3 +57,32 @@ export const getStudentSubjects = async (req, res) => {
         })
     }
 };
+
+
+export const getAllStudents = async (req, res) => {
+  try {
+    // Consultamos todos los cursos
+    const [student] = await pool.query('SELECT * FROM AMS_STUDENTS');
+
+    const response = {
+      content: student,
+      status: true,
+      message: 'Estudiantes obtenidos correctamente'
+    };
+
+    const data = {
+      data: response
+    };
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
+};
