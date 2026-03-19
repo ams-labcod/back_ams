@@ -2,31 +2,31 @@ import { pool } from '../config/db.js'
 
 // ***************************GET A TODOS LOS CURSOS **********************************
 export const getAllTeachers = async (req, res) => {
-  try {
-    // Consultamos todos los cursos
-    const [teacher] = await pool.query('SELECT * FROM AMS_TEACHERS');
+    try {
+        // Consultamos todos los cursos
+        const [teacher] = await pool.query('SELECT * FROM AMS_TEACHERS');
 
-    const response = {
-      content: teacher,
-      status: true,
-      message: 'Profesores obtenidos correctamente'
-    };
+        const response = {
+            content: teacher,
+            status: true,
+            message: 'Profesores obtenidos correctamente'
+        };
 
-    const data = {
-      data: response
-    };
+        const data = {
+            data: response
+        };
 
-    return res.status(200).json(data);
+        return res.status(200).json(data);
 
-  } catch (error) {
-    console.error(error)
+    } catch (error) {
+        console.error(error)
 
-    return res.status(500).json({
-      status: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    })
-  }
+        return res.status(500).json({
+            status: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        })
+    }
 };
 
 //* Crear los criterios
@@ -43,11 +43,7 @@ export const saveCourseCriteria = async (req, res) => {
         // 2️⃣ Recibimos el periodo y el arreglo de criterios
         const { per_id, criterios } = req.body;
 
-        console.log(per_id)
-
-        console.log(criterios)
-
-        // Validamos que vengan exactamente 4 criterios
+        // Validamos que el array que llega del front tenga EXACTAMENTE 4 criterios
         if (!per_id || !criterios || criterios.length !== 4) {
             return res.status(400).json({ message: 'Debe enviar el periodo y exactamente 4 criterios.' });
         }
@@ -65,31 +61,64 @@ export const saveCourseCriteria = async (req, res) => {
         connection = await pool.getConnection();
         await connection.beginTransaction();
 
+        // 🔍 CONSULTAMOS SI YA EXISTEN CRITERIOS PARA ESTE PROFESOR EN ESTE PERIODO
+        const [existingCriteria] = await connection.query(
+            'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
+            [per_id, tea_id]
+        );
 
-        // Insertamos los 4 criterios nuevos
-        for (const item of criterios) {
-            await connection.query(
-                'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?, ?, ?, ?)',
-                [per_id, item.nombre, item.porcentaje, tea_id]
-            );
+        // Si ya existen, VALIDAMOS QUE NO SEAN MÁS DE 4 (Seguridad extra en BD)
+        if (existingCriteria.length > 4) {
+            await connection.rollback();
+            return res.status(500).json({
+                message: 'Inconsistencia en la base de datos: Existen más de 4 criterios registrados.'
+            });
         }
 
+        let isUpdate = false;
+
+        if (existingCriteria.length > 0) {
+            // 🔄 MODO UPDATE: Ya existen, entonces actualizamos los porcentajes
+            isUpdate = true;
+            for (const item of criterios) {
+                await connection.query(
+                    'UPDATE AMS_COURSE_NOTES SET COU_NOT_PERCENT = ? WHERE PER_ID = ? AND TEA_ID = ? AND COU_NOT_CRITERIA = ?',
+                    [item.porcentaje, per_id, tea_id, item.nombre]
+                );
+            }
+        } else {
+            // ➕ MODO INSERT: No existen, los creamos por primera vez
+            for (const item of criterios) {
+                await connection.query(
+                    'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?, ?, ?, ?)',
+                    [per_id, item.nombre, item.porcentaje, tea_id]
+                );
+            }
+        }
+
+        // Confirmamos los cambios en la BD
         await connection.commit();
 
         return res.status(200).json({
             data: {
                 content: null,
                 status: true,
-                message: 'Criterios de evaluación guardados correctamente'
+                message: isUpdate
+                    ? 'Criterios de evaluación actualizados correctamente'
+                    : 'Criterios de evaluación creados correctamente'
             }
         });
 
     } catch (error) {
         if (connection) await connection.rollback();
 
-        console.error('❌ ERROR GUARDANDO CRITERIOS:', error);
+        console.error('❌ ERROR GUARDANDO/ACTUALIZANDO CRITERIOS:', error);
 
-        return res.status(500).json({ errorMessage: 'Error interno del servidor al guardar criterios' });
+        return res.status(500).json({
+            status: false,
+            message: 'Error interno del servidor al procesar los criterios',
+            error: error.message
+        });
 
     } finally {
         if (connection) connection.release();
