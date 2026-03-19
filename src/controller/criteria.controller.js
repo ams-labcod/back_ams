@@ -28,9 +28,40 @@ export const create_criteria = async (req = request, res = response) => {
     connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    // 2️⃣ Insertar criterio
-    const [result] = await connection.query(
-      `
+    // Consultar si YA existe un registro de criterios en la tabla
+    const [existingCriteria] = await connection.query('SELECT * FROM AMS_CRITERIA LIMIT 1');
+
+
+    if (existingCriteria.length > 0) {
+      //modo actualizacion
+      const idCriterio = existingCriteria[0].CRI_ID;
+
+      await connection.query(
+        `
+        UPDATE AMS_CRITERIA 
+        SET 
+          CRI_NOTE_MIN = ?, 
+          CRI_NOTE_MAX = ?, 
+          CRI_PASSING_GRADE = ?, 
+          CRI_ACADEMICS_BREAKS = ?, 
+          PEO_ID = ?
+        WHERE CRI_ID = ?
+        `,
+        [cri_note_min, cri_note_max, cri_passing_grade, cri_academics_breaks, peo_id, idCriterio]
+      );
+
+      await connection.commit();
+
+      return res.status(200).json({
+        status: true,
+        message: 'Criterios actualizados correctamente'
+      });
+
+    } else {
+
+      // 2️⃣ Insertar criterio
+      const [result] = await connection.query(
+        `
       INSERT INTO AMS_CRITERIA
       (
         CRI_NOTE_MIN,
@@ -42,23 +73,27 @@ export const create_criteria = async (req = request, res = response) => {
       )
       VALUES (?, ?, ?, ?, ?, ?)
       `,
-      [
-        cri_note_min,
-        cri_note_max,
-        cri_passing_grade,
-        cri_academics_breaks,
-        'A',
-        peo_id
-      ]
-    );
+        [
+          cri_note_min,
+          cri_note_max,
+          cri_passing_grade,
+          cri_academics_breaks,
+          'A',
+          peo_id
+        ]
+      );
 
-    // 3️⃣ Confirmar transacción
-    await connection.commit();
+      // 3️⃣ Confirmar transacción
+      await connection.commit();
 
-    return res.status(201).json({
-      status: true,
-      message: 'Criterio creado correctamente'
-    });
+      return res.status(201).json({
+        status: true,
+        message: 'Criterio creado correctamente'
+      });
+
+
+    }
+
 
   } catch (error) {
 
@@ -79,36 +114,36 @@ export const create_criteria = async (req = request, res = response) => {
   }
 };
 
-export const getAllCriteria = async (req,res) => {
+export const getAllCriteria = async (req, res) => {
 
-   try {
+  try {
 
-        const [data] = await pool.query('SELECT  * FROM  AMS_CRITERIA')
+    const [data] = await pool.query('SELECT  * FROM  AMS_CRITERIA')
 
-        if (data.length === 0) return res.status(404).json({ errorMessage: 'No hay criterios creados' })
+    if (data.length === 0) return res.status(404).json({ errorMessage: 'No hay criterios creados' })
 
-        const result = {
-            content: data,
-            status: true,
-            message: 'Lista de todos los criterios'
-        }
-
-        const Data = {
-            data: data
-        }
-
-        return res.status(200).json(Data)
-
-
-    } catch (error) {
-
-        console.log(error)
-
-        return res.status(500).json({
-            status: false,
-            message: 'Error interno del servidor',
-            error: error.message
-        })
-
+    const result = {
+      content: data,
+      status: true,
+      message: 'Lista de todos los criterios'
     }
+
+    const Data = {
+      data: data
+    }
+
+    return res.status(200).json(Data)
+
+
+  } catch (error) {
+
+    console.log(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+
+  }
 }
