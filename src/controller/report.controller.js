@@ -349,7 +349,9 @@ export const getTeacherGradebook = async (req, res) => {
         cn.ID_COU_NOTES AS CRITERIO_ID,
         cn.COU_NOT_CRITERIA AS CRITERIO,
         cn.COU_NOT_PERCENT AS PORCENTAJE,
-        n.NOT_VALUE
+        n.NOT_VALUE,
+        n.NOT_TYPE,
+        n.COU_NOTES_ID
       FROM AMS_COURSE_SUBJECT cs
       INNER JOIN AMS_TEACHERS t 
         ON cs.TEA_PEO_ID = t.TEA_PEO_ID
@@ -419,7 +421,9 @@ export const getTeacherGradebook = async (req, res) => {
             actividad: row.ACTIVIDAD,
             criterio: row.CRITERIO,
             porcentaje: row.PORCENTAJE,
-            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null
+            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
+            tipo_nota: row.NOT_TYPE,
+            criterio_nota_id : row.COU_NOTES_ID
           });
 
         }
