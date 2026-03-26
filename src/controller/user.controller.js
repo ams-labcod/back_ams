@@ -450,3 +450,143 @@ export const getUserProfileByUser = async (req, res) => {
     })
   }
 };
+
+
+
+export const delete_person = async (req, res) => {
+  const { peo_id } = req.params;
+
+  try {
+
+    const [person] = await pool.query('SELECT PEO_ID FROM AMS_PEOPLE WHERE PEO_ID = ?', [peo_id]);
+
+    if (person.length === 0) {
+      return res.status(404).json({ message: 'El usuario no existe en el sistema' });
+    }
+
+    // Soft Delete
+    await pool.query(
+      `UPDATE AMS_PEOPLE SET PEO_STATE = 'I' WHERE PEO_ID = ?`,
+      [peo_id]
+    );
+
+    const response = {
+      content: null,
+      status: true,
+      message: 'Usuario eliminado (inactivado) correctamente'
+    };
+
+    return res.status(200).json({ data: response });
+
+  } catch (error) {
+    console.error('❌ ERROR DELETE_PERSON:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor al intentar eliminar el usuario',
+      error: error.message
+    });
+  }
+};
+
+
+
+export const update_person = async (req, res) => {
+  // Recibimos el ID de la persona por los parámetros de la ruta (Ej: /api/users/update/123-uuid)
+  const { peo_id } = req.params;
+
+  const {
+    usu_name1,
+    usu_name2,
+    usu_lastname1,
+    usu_lastname2,
+    usu_level,
+    usu_grade,
+    usu_grade_l,
+    usu_sex,
+    usu_birth,
+    usu_place_birth,
+    usu_cel,
+    usu_correo,
+    usu_city,
+    usu_departament,
+    usu_address,
+    usu_eps,
+    usu_population,
+    usu_prev_school,
+    usu_allergies,
+    usu_condition
+  } = req.body;
+
+  let connection;
+
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    // 1️⃣ Validar si la persona existe y obtener su tipo
+    const [personInfo] = await connection.query(
+      'SELECT PEO_TP_PERSON FROM AMS_PEOPLE WHERE PEO_ID = ? LIMIT 1',
+      [peo_id]
+    );
+
+    if (personInfo.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ message: 'Usuario no encontrado en el sistema' });
+    }
+
+    const tipoPersona = personInfo[0].PEO_TP_PERSON?.trim().toUpperCase();
+
+    // 2️⃣ Actualizar datos en AMS_PEOPLE
+    await connection.query(
+      `UPDATE AMS_PEOPLE SET 
+        PEO_NAME_1 = ?, PEO_NAME_2 = ?, PEO_LAST_NAME_1 = ?, PEO_LAST_NAME_2 = ?, 
+        PEO_LEVEL = ?, PEO_GRADE = ?, PEO_GRADE_L = ?, PEO_SEX = ?, PEO_BIRTH = ?, 
+        PEO_PLACE_BIRTH = ?, PEO_CEL = ?, PEO_EMAIL = ?, PEO_CITY = ?, PEO_DEPARTAMENT = ?, 
+        PEO_ADDRESS = ?, PEO_EPS = ?, PEO_POPULATION = ?, PEO_PREV_SCHOOL = ?, 
+        PEO_ALLERGIES = ?, PEO_CONDITION = ?
+       WHERE PEO_ID = ?`,
+      [
+        usu_name1, usu_name2, usu_lastname1, usu_lastname2, usu_level, usu_grade, usu_grade_l,
+        usu_sex, usu_birth, usu_place_birth, usu_cel, usu_correo, usu_city, usu_departament,
+        usu_address, usu_eps, usu_population, usu_prev_school, usu_allergies, usu_condition,
+        peo_id
+      ]
+    );
+
+    // 3️⃣ Mantener sincronizados los nombres en las tablas secundarias (Docentes o Estudiantes)
+    if (tipoPersona === 'DOCENTE') {
+      await connection.query(
+        'UPDATE AMS_TEACHERS SET TEA_NAME = ?, TEA_LAST_NAME = ? WHERE TEA_PEO_ID = ?',
+        [usu_name1, usu_lastname1, peo_id]
+      );
+    } else if (tipoPersona === 'ESTUDIANTE') {
+      // Si quieres permitir cambiar de curso, puedes agregar el cou_id aquí también
+      await connection.query(
+        'UPDATE AMS_ESTUDENTS SET EST_NAME = ?, EST_LAST_NAME = ? WHERE EST_PEO_ID = ?',
+        [usu_name1, usu_lastname1, peo_id]
+      );
+    }
+
+    // 4️⃣ Confirmar transacción
+    await connection.commit();
+
+    return res.status(200).json({
+      data: {
+        content: null,
+        status: true,
+        message: 'Usuario actualizado correctamente'
+      }
+    });
+
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('❌ ERROR UPDATE_PERSON:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+};
