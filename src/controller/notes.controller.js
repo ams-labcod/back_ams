@@ -45,7 +45,7 @@ export const getAllNotes = async (req = request, res = response) => {
 
 export const createNote = async (req = request, res = response) => {
 
-  const { eva_id, not_est_id, not_value, not_date } = req.body
+  const { eva_id, not_est_id, not_value, not_date, not_type = 'NORMAL', cou_notes_id = null } = req.body
 
   try {
 
@@ -53,12 +53,19 @@ export const createNote = async (req = request, res = response) => {
 
     const [validateEvaluation] = await pool.query('SELECT eva_id FROM AMS_EVALUATION WHERE eva_id = ?', [eva_id])
 
-    if (validateStudent.length ===  0) return res.status(400).json({ errorMessage: 'El estudiante no existe' })
+    if (validateStudent.length === 0) return res.status(400).json({ errorMessage: 'El estudiante no existe' })
 
-    if (validateEvaluation.length ===  0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
+    if (validateEvaluation.length === 0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
 
-    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date) VALUES (?,?,?,?)',
-      [eva_id, not_est_id, not_value, not_date])
+    if (cou_notes_id) {
+      const [validateCriteria] = await pool.query('SELECT ID_COU_NOTES FROM AMS_COURSE_NOTES WHERE ID_COU_NOTES = ?', [cou_notes_id]);
+      if (validateCriteria.length === 0) {
+        return res.status(400).json({ errorMessage: 'El criterio de evaluación especificado no existe' });
+      }
+    }
+
+    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?)',
+      [eva_id, not_est_id, not_value, not_date, not_type, cou_notes_id])
 
     const response = {
 
