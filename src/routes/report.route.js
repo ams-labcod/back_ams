@@ -12,13 +12,13 @@ const router = Router()
 router.patch('/teachers/:tea_peo_id/director',verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), assignGroupDirector);
 
 //* - este reporte lo tendria que ver el administrativo y el director de grupo 
-router.get('/consolidated/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER'),  getConsolidatedByCourse )
+router.get('/consolidated/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER','ROL_STUDENT'),  getConsolidatedByCourse )
 
 //* Todos los cursos con sus directores
 router.get(
   '/coursesDirectors/all', 
   verifyJwt, 
-  validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER'), 
+  validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER','ROL_STUDENT'), 
   getAllCourseDirectors
 );
 

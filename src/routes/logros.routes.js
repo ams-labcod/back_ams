@@ -11,7 +11,7 @@ const router = Router()
 //* - PROFESOR
 router.post('/create_logro', verifyJwt, validateRoles('ROL_ADMIN','ROL_TEACHER','ROL_ADMINISTRATIVO'),  create_logro )
 
-router.get('/logros/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_TEACHER','ROL_ADMINISTRATIVO'),  get_logros_by_course )
+router.get('/logros/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_STUDENT'),  get_logros_by_course )
 
 router.put('/logros/:report_id',verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_ADMIN'), update_logro)
 
