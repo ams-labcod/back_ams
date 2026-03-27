@@ -12,7 +12,7 @@ import { validateRoles } from '../middlewares/validateRols.js';
 
 const router = Router();
 
-const GRADOS = {
+let GRADOS = {
   PREESCOLAR: [
     'PARVULO',
     'PREJARDIN',
