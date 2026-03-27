@@ -2,13 +2,14 @@ import { Router } from 'express';
 
 import { check } from 'express-validator';
 
-import { create_person, login, getusers, userProfile, getUserProfileByUser } from '../controller/user.controller.js';
+import { create_person, login, getusers, userProfile, getUserProfileByUser, delete_person, update_person } from '../controller/user.controller.js';
 
 import { validations } from '../middlewares/validations.js';
 
 import { verifyJwt } from '../middlewares/verifyToken.js'
 
 import { validateRoles } from '../middlewares/validateRols.js';
+import { ValidationHalt } from 'express-validator/lib/base.js';
 
 const router = Router();
 // ,validateRolAdministrativo,
@@ -234,5 +235,9 @@ router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIV
 router.get('/users/profile', verifyJwt, userProfile)
 
 router.get('/users/:id_users', verifyJwt, getUserProfileByUser)
+
+router.delete('/users/:peo_id', verifyJwt,  validateRoles('ROL_ADMINISTRATIVO','ROL_ADMIN'), delete_person)
+
+router.put('/users/:peo_id',verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
 
 export default router;
