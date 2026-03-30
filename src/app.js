@@ -26,6 +26,8 @@ import studentRoute from './routes/student.route.js'
 
 import teachersRoute from './routes/teachers_route.js'
 
+import observerRoute from './routes/observer.route.js'
+
 
 import cors from 'cors';    
 
@@ -61,4 +63,5 @@ app.use('/', reportedRoute)
 app.use('/', logrosRoutes)  
 app.use('/', studentRoute)
 app.use('/', teachersRoute)
+app.use('/', observerRoute)
 export default app;
