@@ -290,7 +290,44 @@ export const getusers = async (req, res) => {
 
     const [totalUser] = await pool.query('SELECT COUNT(*) AS total FROM AMS_USERS')
 
-    const [users] = await pool.query('SELECT * FROM AMS_USERS LIMIT ? OFFSET ? ', [limitValue, offsetValue])
+    // const [users] = await pool.query('SELECT * FROM AMS_USERS LIMIT ? OFFSET ? ', [limitValue, offsetValue])
+
+    const [users] = await pool.query(
+      `SELECT 
+        p.PEO_ID AS peo_id,
+        u.USU_ROLE AS usu_role,
+        u.USU_USER AS usu_user,
+        p.PEO_NAME_1 AS usu_name1,
+        p.PEO_NAME_2 AS usu_name2,
+        p.PEO_LAST_NAME_1 AS usu_lastname1,
+        p.PEO_LAST_NAME_2 AS usu_lastname2,
+        p.PEO_TP_PERSON AS usu_tp_person,
+        p.PEO_TP_ID AS usu_tp_id,
+        p.PEO_IDENTIFICATION AS usu_identification,
+        p.PEO_LEVEL AS usu_level,
+        p.PEO_TP_REG AS usu_tp_reg,
+        p.PEO_GRADE AS usu_grade,
+        p.PEO_GRADE_L AS usu_grade_l,
+        p.PEO_SEX AS usu_sex,
+        p.PEO_BIRTH AS usu_birth,
+        p.PEO_PLACE_BIRTH AS usu_place_birth,
+        p.PEO_CEL AS usu_cel,
+        p.PEO_EMAIL AS usu_correo,
+        p.PEO_CITY AS usu_city,
+        p.PEO_DEPARTAMENT AS usu_departament,
+        p.PEO_ADDRESS AS usu_address,
+        p.PEO_EPS AS usu_eps,
+        p.PEO_POPULATION AS usu_population,
+        p.PEO_PREV_SCHOOL AS usu_prev_school,
+        p.PEO_ALLERGIES AS usu_allergies,
+        p.PEO_CONDITION AS usu_condition,
+        e.COU_ID AS cou_id -- Solo traerá dato si es estudiante, sino será null
+      FROM AMS_USERS u
+      INNER JOIN AMS_PEOPLE p ON u.USU_PEO_ID = p.PEO_ID
+      LEFT JOIN AMS_ESTUDENTS e ON p.PEO_ID = e.EST_PEO_ID
+      LIMIT ? OFFSET ?`, 
+      [limitValue, offsetValue]
+    );
 
     const total = totalUser[0].total
 

@@ -162,7 +162,7 @@ router.post(
 
 router.get('/getOne/:id_course', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_STUDENT'),getCourseById );
 
-router.get('/getAllCourses', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER'), getAllCourses);
+router.get('/getAllCourses', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER', 'ROL_STUDENT'), getAllCourses);
 
 router.get('/getAllCourseAct', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCoursesAct);
 
