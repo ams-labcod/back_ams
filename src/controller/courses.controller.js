@@ -8,7 +8,9 @@ export const createCourse = async (req, res) => {
 
     const { cou_level, cou_name_teach, cou_num_courses } = req.body;
 
-    if (cou_level === 'PREESCOLAR') {
+    let nivel = cou_level
+
+    if (nivel === 'PREESCOLAR' || nivel === 'PREJARDIN' || nivel === 'NIVELACIÓN' || nivel === 'PARVULO') {
       cou_num_courses = null;
     }
 
