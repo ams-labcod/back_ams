@@ -25,7 +25,7 @@ export const saveObserver = async (req, res) => {
 
     // 3️⃣ VALIDACIÓN DE SEGURIDAD: ¿Es el director de grupo correcto?
     // Si el usuario NO es administrador, tenemos que validar su curso
-    if (usu_role !== 'ROL_ADMIN') {
+    if (usu_role !== 'ROL_ADMINISTRATIVO') {
       
       // A. Buscamos en qué curso está matriculado el estudiante
       const [student] = await connection.query(
