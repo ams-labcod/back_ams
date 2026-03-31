@@ -46,6 +46,9 @@ export const saveObserver = async (req, res) => {
         [peo_id]
       );
 
+      console.log('Curso del Estudiante:', studentCourse);
+      console.log('Curso del Profesor (Director):', teacher.length > 0 ? teacher[0].TEA_GROUP_DIR : 'Ninguno');
+
       // C. Si no es director de nada, o si su curso dirigido no coincide con el del estudiante: Bloqueo
       if (teacher.length === 0 || teacher[0].TEA_GROUP_DIR !== studentCourse) {
         await connection.rollback();
