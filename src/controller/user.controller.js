@@ -321,6 +321,7 @@ export const getusers = async (req, res) => {
         p.PEO_PREV_SCHOOL AS usu_prev_school,
         p.PEO_ALLERGIES AS usu_allergies,
         p.PEO_CONDITION AS usu_condition,
+        p.PEO_STATE AS estado,
         e.COU_ID AS cou_id -- Solo traerá dato si es estudiante, sino será null
       FROM AMS_USERS u
       INNER JOIN AMS_PEOPLE p ON u.USU_PEO_ID = p.PEO_ID
