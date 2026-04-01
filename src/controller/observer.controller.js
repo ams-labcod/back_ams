@@ -6,7 +6,7 @@ export const saveObserver = async (req, res) => {
     // 1️⃣ Obtener datos del token (quién hace la petición)
     const peo_id = req.user.peoId;
     const usu_role = req.user.usu_role; // Necesitamos saber si es ROL_ADMIN o ROL_TEACHER
-    
+
     const {
       est_id, //id estudiante
       per_id, //id periodo
@@ -26,7 +26,7 @@ export const saveObserver = async (req, res) => {
     // 3️⃣ VALIDACIÓN DE SEGURIDAD: ¿Es el director de grupo correcto?
     // Si el usuario NO es administrador, tenemos que validar su curso
     if (usu_role !== 'ROL_ADMINISTRATIVO') {
-      
+
       // A. Buscamos en qué curso está matriculado el estudiante
       const [student] = await connection.query(
         'SELECT COU_ID FROM AMS_ESTUDENTS WHERE EST_ID = ?',
@@ -50,7 +50,8 @@ export const saveObserver = async (req, res) => {
       console.log('Curso del Profesor (Director):', teacher.length > 0 ? teacher[0].TEA_GROUP_DIR : 'Ninguno');
 
       // C. Si no es director de nada, o si su curso dirigido no coincide con el del estudiante: Bloqueo
-      if (teacher.length === 0 || teacher[0].TEA_GROUP_DIR !== studentCourse) {
+      if (teacher.length === 0 ||
+        String(teacher[0].TEA_GROUP_DIR).trim() !== String(studentCourse).trim()) {
         await connection.rollback();
         return res.status(403).json({
           message: 'Acceso denegado: Solo el director de grupo de este curso puede modificar el observador del estudiante.'
@@ -70,12 +71,12 @@ export const saveObserver = async (req, res) => {
         OBS_COEXISTENCE = VALUES(OBS_COEXISTENCE),
         PEO_ID = VALUES(PEO_ID)`, // Actualizamos quién fue el último en editarlo
       [
-        est_id, 
-        per_id, 
+        est_id,
+        per_id,
         obs_strengths || '',      // Si mandan vacío, guardamos string vacío en vez de null
-        obs_difficulties || '', 
-        obs_commitments || '', 
-        obs_coexistence || '', 
+        obs_difficulties || '',
+        obs_commitments || '',
+        obs_coexistence || '',
         peo_id
       ]
     );

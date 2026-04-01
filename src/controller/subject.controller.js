@@ -100,8 +100,16 @@ export const getCourseSubjectById = async (req, res) => {
 // Actualizar una materia
 export const updateCourseSubject = async (req, res) => {
   try {
+
     const { id } = req.params;
+    
     const { cou_id, tea_peo_id, cos_subject_name } = req.body;
+
+    if (!cou_id || !tea_peo_id || !cos_subject_name) {
+      return res.status(400).json({ 
+        message: 'Faltan datos obligatorios. Debes enviar el ID DEL CURSO, el ID DEL PROFESOR y el NOMBRE DE LA ASIGNATURA.' 
+      });
+    }
 
     const [result] = await pool.query(
       'UPDATE AMS_COURSE_SUBJECT SET COU_ID = ?, TEA_PEO_ID = ?, COS_SUBJECT_NAME = ? WHERE COS_ID = ?',
