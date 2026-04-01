@@ -229,7 +229,7 @@ router.post(
     login
 );
 
-router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getusers);
+router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER'), getusers);
 
 //Ver perfil (persona verificado - privada )-- 
 router.get('/users/profile', verifyJwt, userProfile)
