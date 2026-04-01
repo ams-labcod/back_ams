@@ -46,6 +46,9 @@ export const saveObserver = async (req, res) => {
         [peo_id]
       );
 
+      console.log('Curso del Estudiante:', studentCourse);
+      console.log('Curso del Profesor (Director):', teacher.length > 0 ? teacher[0].TEA_GROUP_DIR : 'Ninguno');
+
       // C. Si no es director de nada, o si su curso dirigido no coincide con el del estudiante: Bloqueo
       if (teacher.length === 0 || teacher[0].TEA_GROUP_DIR !== studentCourse) {
         await connection.rollback();
@@ -97,5 +100,60 @@ export const saveObserver = async (req, res) => {
     });
   } finally {
     if (connection) connection.release();
+  }
+};
+
+export const getObserver = async (req, res) => {
+  try {
+    // 1️⃣ Recibimos los parámetros por la URL (Ej: /api/observer/uuid-estudiante/1)
+    const { est_id, per_id } = req.params;
+
+    if (!est_id || !per_id) {
+      return res.status(400).json({ message: 'El ID del estudiante y el periodo son obligatorios.' });
+    }
+
+    // 2️⃣ Consultamos la base de datos
+    const [observerData] = await pool.query(
+      `SELECT 
+        OBS_ID AS obs_id,
+        EST_ID AS est_id,
+        PER_ID AS per_id,
+        OBS_STRENGTHS AS obs_strengths,
+        OBS_DIFFICULTIES AS obs_difficulties,
+        OBS_COMMITMENTS AS obs_commitments,
+        OBS_COEXISTENCE AS obs_coexistence,
+        PEO_ID AS peo_id
+      FROM AMS_OBSERVER 
+      WHERE EST_ID = ? AND PER_ID = ? LIMIT 1`,
+      [est_id, per_id]
+    );
+
+    // 3️⃣ Si no hay observador aún, devolvemos null para que el frontend sepa que está vacío
+    if (observerData.length === 0) {
+      return res.status(200).json({
+        data: {
+          content: null,
+          status: true,
+          message: 'El estudiante aún no tiene un observador registrado para este periodo.'
+        }
+      });
+    }
+
+    // 4️⃣ Si existe, devolvemos los datos
+    return res.status(200).json({
+      data: {
+        content: observerData[0],
+        status: true,
+        message: 'Observador obtenido correctamente.'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR OBTENIENDO OBSERVADOR:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor al obtener el observador',
+      error: error.message
+    });
   }
 };
