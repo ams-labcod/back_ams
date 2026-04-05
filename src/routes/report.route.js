@@ -4,7 +4,7 @@ import { verifyJwt } from '../middlewares/verifyToken.js';
 
 import { validateRoles } from "../middlewares/validateRols.js";
 
-import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook } from "../controller/report.controller.js";
+import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook, getMyDirector } from "../controller/report.controller.js";
 
 const router = Router()
 
@@ -20,6 +20,14 @@ router.get(
   verifyJwt, 
   validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER','ROL_STUDENT'), 
   getAllCourseDirectors
+);
+
+//* Obtener el director del curso del estudiante logueado
+router.get(
+  '/coursesDirectors/my-director', 
+  verifyJwt, 
+  validateRoles('ROL_STUDENT'), 
+  getMyDirector
 );
 
 router.get('/teacher/gradebook', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO', 'ROL_ADMIN', 'ROL_STUDENT'), getTeacherGradebook)
