@@ -114,6 +114,49 @@ export const assignGroupDirector = async (req, res) => {
   }
 };
 
+// * Obtener únicamente el director de grupo del estudiante logueado
+export const getMyDirector = async (req, res) => {
+  try {
+    // 1️⃣ Extraemos el ID del estudiante desde su JWT
+    const peo_id = req.user.peoId;
+
+    if (!peo_id) {
+      return res.status(401).json({ message: 'No se pudo identificar al estudiante desde el token.' });
+    }
+
+    // 2️⃣ Consulta SQL optimizada para traer solo lo necesario
+    const [result] = await pool.query(
+      `SELECT 
+        t.TEA_NAME AS DocenteNombre, 
+        t.TEA_LAST_NAME AS DocenteApellido, 
+        e.COU_ID AS CursoID
+      FROM AMS_ESTUDENTS e
+      LEFT JOIN AMS_TEACHERS t ON e.COU_ID = t.TEA_GROUP_DIR AND t.TEA_STATE = 'A'
+      WHERE e.EST_PEO_ID = ?`,
+      [peo_id]
+    );
+
+    // 3️⃣ Validamos si el estudiante existe
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Estudiante no encontrado en el sistema.' });
+    }
+
+    const directorData = result[0];
+
+    // 4️⃣ Armamos la respuesta EXACTAMENTE como la pidió el frontend
+    return res.status(200).json({
+      data: {
+        DocenteNombre: directorData.DocenteNombre || "Sin asignar",
+        DocenteApellido: directorData.DocenteApellido || "",
+        CursoID: directorData.CursoID
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR OBTENIENDO MI DIRECTOR:', error);
+    return res.status(500).json({ errorMessage: 'Error en el servidor al obtener el director de grupo' });
+  }
+};
 
 
 //* obtener todos los cursos con sus directores
