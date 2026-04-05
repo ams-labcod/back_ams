@@ -92,3 +92,92 @@ export const createNote = async (req = request, res = response) => {
 
   }
 }
+
+
+export const getStudentNotes = async (req, res) => {
+  try {
+    // 1️⃣ Extraemos el ID de la persona (estudiante) desde su token
+    const peo_id = req.user.peoId;
+    
+    // Recibimos el periodo por la URL (Ej: /student/notes?per_id=1)
+    const { per_id } = req.query;
+
+    if (!peo_id) {
+      return res.status(401).json({ message: 'No se pudo identificar al estudiante.' });
+    }
+
+    if (!per_id) {
+      return res.status(400).json({ message: 'Debe enviar el periodo a consultar (?per_id=X).' });
+    }
+
+    // 2️⃣ Consulta SQL: Traemos solo las materias y notas de ESTE estudiante en ESTE periodo
+    const [rows] = await pool.query(
+      `SELECT 
+        cs.COS_ID AS id_materia,
+        cs.COS_SUBJECT_NAME AS materia,
+        ev.EVA_ID AS id_evaluacion,
+        ev.EVA_NAME AS actividad,
+        cn.COU_NOT_CRITERIA AS criterio,
+        cn.COU_NOT_PERCENT AS porcentaje,
+        n.NOT_VALUE AS nota
+      FROM AMS_ESTUDENTS e
+      INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
+      INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
+      -- Unimos las notas asegurando que coincida la evaluación y el ID del estudiante
+      LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
+      -- Unimos los criterios (DBA, DB, etc.) si existen
+      LEFT JOIN AMS_COURSE_NOTES cn ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
+      WHERE e.EST_PEO_ID = ? AND ev.EVA_PER_ID = ? AND cs.COS_STATE = 'A'
+      ORDER BY cs.COS_SUBJECT_NAME ASC, ev.EVA_DATE ASC`,
+      [peo_id, per_id]
+    );
+
+    if (rows.length === 0) {
+      // Devolvemos un content vacío pero con status 200, significa que no hay notas aún
+      return res.status(200).json({ 
+        data: { content: [], status: true, message: 'No hay notas registradas para este periodo.' } 
+      });
+    }
+
+    // 3️⃣ Magia de JavaScript: Agrupar por materias para armar el JSON que pide el Frontend
+    const groupedData = {};
+
+    rows.forEach(row => {
+      // Si la materia aún no existe en nuestro objeto agrupador, la creamos
+      if (!groupedData[row.id_materia]) {
+        groupedData[row.id_materia] = {
+          id_materia: row.id_materia,
+          materia: row.materia,
+          notas: []
+        };
+      }
+
+      // Si hay una evaluación creada, empujamos la nota al arreglo de esa materia
+      if (row.id_evaluacion) {
+        groupedData[row.id_materia].notas.push({
+          id_evaluacion: row.id_evaluacion,
+          actividad: row.actividad,
+          criterio: row.criterio || "Sin criterio",
+          porcentaje: row.porcentaje || 0,
+          nota: row.nota !== null ? row.nota : null // Null si el profe aún no ha calificado
+        });
+      }
+    });
+
+    // Convertimos nuestro objeto agrupador en un Arreglo (Array) limpio
+    const contentArray = Object.values(groupedData);
+
+    // 4️⃣ Respuesta Final: Exactamente el formato que solicitó el Frontend
+    return res.status(200).json({
+      data: {
+        content: contentArray,
+        status: true,
+        message: 'Notas del estudiante obtenidas correctamente'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR OBTENIENDO NOTAS DEL ESTUDIANTE:', error);
+    return res.status(500).json({ errorMessage: 'Error en el servidor al obtener las notas' });
+  }
+};
