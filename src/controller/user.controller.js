@@ -666,16 +666,10 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
 
     const config = {
       service: "gmail",
-      port: 465,
-      secure: true,
       debug: true,
-      secureConnection: false,
       auth: {
         user: 'afanador1106@gmail.com',
         pass: 'vtsu hhnz cgvt yhwa'
-      },
-      tls: {
-        rejectUnAuthorized: true
       }
     }
 
