@@ -244,6 +244,6 @@ router.post('/auth/correo-recuperar', EnviarCorreoRecuperacion);
 
 router.post('/auth/recuperar-contrasena', recuperarContrasena);
 
-router.get('/users/:peo_id', verifyJwt, getByIdUsers)
+router.get('/userById/:peo_id', verifyJwt, getByIdUsers)
 
 export default router;
