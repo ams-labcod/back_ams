@@ -663,8 +663,8 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     );
 
     // Configuramos el enlace (¡Recuerda cambiarlo por la URL real de tu Frontend AMS!)
-    const link = `https://tu-frontend-ams.com/forgot-password/${token}`;
-
+    const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
+    
     // Configuración de Nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail",
