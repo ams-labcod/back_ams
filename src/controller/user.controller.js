@@ -665,7 +665,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     const link = `https://localhost:3000/forgot-password/${token}`;
 
     const config = {
-      service: "smtp.gmail.com",
+      host: "smtp.gmail.com",
       port: 587,
       secure: false,
       debug: true,
