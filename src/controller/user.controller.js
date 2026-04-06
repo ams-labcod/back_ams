@@ -683,7 +683,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     });
 
     const mailOptions = {
-      from: '"Soporte AMS" <afanador1106@gmail.com>',
+      from: 'afanador1106@gmail.com',
       to: peo_email,
       subject: "Recuperación de Contraseña",
       html: `
