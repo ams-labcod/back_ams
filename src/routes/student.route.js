@@ -16,7 +16,7 @@ router.get(
   getStudentSubjects
 );
 
-router.get('/my-grades', verifyJwt, validateRoles('ROL_STUDENT'), getMyGrades);
+router.get('/my-grades', verifyJwt, validateRoles('ROL_STUDENT', 'ROL_ADMINISTRATIVO'), getMyGrades);
 
 router.get('/student/getAll', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMIN', 'ROL_ADMINISTRATIVO'), getAllStudents)
 

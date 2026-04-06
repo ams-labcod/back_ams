@@ -26,7 +26,7 @@ router.get(
 router.get(
   '/coursesDirectors/my-director', 
   verifyJwt, 
-  validateRoles('ROL_STUDENT'), 
+  validateRoles('ROL_STUDENT', 'ROL_ADMINISTRATIVO'), 
   getMyDirector
 );
 
