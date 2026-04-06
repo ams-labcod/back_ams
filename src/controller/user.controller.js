@@ -2,6 +2,7 @@ import { pool } from '../config/db.js'
 import { salt } from '../utils/salt.js'
 import bcrypt from 'bcrypt'
 import { generateJwt } from '../helpers/generate-jwt.js'
+import {generarTokenUnico} from '../utils/generateTokenUnique.js'
 
 export const create_person = async (req, res) => {
 
