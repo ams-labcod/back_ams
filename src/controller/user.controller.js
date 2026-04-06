@@ -326,7 +326,7 @@ export const getusers = async (req, res) => {
       FROM AMS_USERS u
       INNER JOIN AMS_PEOPLE p ON u.USU_PEO_ID = p.PEO_ID
       LEFT JOIN AMS_ESTUDENTS e ON p.PEO_ID = e.EST_PEO_ID
-      LIMIT ? OFFSET ?`, 
+      LIMIT ? OFFSET ?`,
       [limitValue, offsetValue]
     );
 
@@ -626,5 +626,128 @@ export const update_person = async (req, res) => {
     });
   } finally {
     if (connection) connection.release();
+  }
+};
+
+
+
+
+//* Correo de recuperación
+export const EnviarCorreoRecuperacion = async (req, res) => {
+  // Ahora recibimos el correo (PEO_EMAIL)
+  const { peo_email } = req.body;
+
+  try {
+    // Verificamos si el correo existe en AMS_PEOPLE y si tiene un usuario asociado en AMS_USERS
+    const [userCheck] = await pool.query(
+      `SELECT p.PEO_ID, p.PEO_NAME_1, u.USU_ID 
+       FROM AMS_PEOPLE p
+       INNER JOIN AMS_USERS u ON p.PEO_ID = u.USU_PEO_ID
+       WHERE p.PEO_EMAIL = ? LIMIT 1`,
+      [peo_email]
+    );
+
+    if (userCheck.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado en el sistema con ese correo' });
+    }
+
+    const { USU_ID, PEO_NAME_1 } = userCheck[0];
+
+    // Generamos el token
+    const token = await generarTokenUnico();
+
+    // Guardamos el token en la tabla de usuarios
+    await pool.query(
+      'UPDATE AMS_USERS SET USU_RECOVERY_TOKEN = ? WHERE USU_ID = ?',
+      [token, USU_ID]
+    );
+
+    // Configuramos el enlace (¡Recuerda cambiarlo por la URL real de tu Frontend AMS!)
+    const link = `https://tu-frontend-ams.com/forgot-password/${token}`;
+
+    // Configuración de Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'afanador1106@gmail.com',
+        pass: 'svpp xpra jqez xqzr' // ⚠️ TIP: En producción, guarda esto en un archivo .env
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    const mailOptions = {
+      from: '"Soporte AMS" <afanador1106@gmail.com>',
+      to: peo_email,
+      subject: "Recuperación de Contraseña",
+      html: `
+        <h2>Recuperación de Contraseña</h2>
+        <p>Hola <b>${PEO_NAME_1}</b>,</p>
+        <p>Has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace para crear una nueva:</p>
+        <p><a href="${link}" style="color: blue; text-decoration: underline;">${link}</a></p>
+        <p>Si no fuiste tú, ignora este correo.</p>
+      `
+    };
+
+    // Enviamos el correo
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({
+      data: {
+        content: null,
+        status: true,
+        message: 'Correo de recuperación enviado con éxito'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR ENVIANDO CORREO:', error);
+    return res.status(500).json({ errorMessage: 'Error interno al enviar el correo de recuperación' });
+  }
+};
+
+
+
+
+//* Recuperar contraseña
+export const recuperarContrasena = async (req, res) => {
+  const { token, usu_password } = req.body;
+
+  try {
+    // Buscamos al usuario que tenga ese token de recuperación
+    const [usuario] = await pool.query(
+      'SELECT USU_ID FROM AMS_USERS WHERE USU_RECOVERY_TOKEN = ? LIMIT 1',
+      [token]
+    );
+
+    if (usuario.length === 0) {
+      return res.status(400).json({ message: 'El token no es válido o ya ha sido utilizado' });
+    }
+
+    const { USU_ID } = usuario[0];
+
+    // Hasheamos la nueva contraseña asegurando que sea string
+    const hashNewPassword = await bcrypt.hash(String(usu_password).trim(), salt);
+
+    // Actualizamos la contraseña y anulamos el token pasándolo a NULL
+    await pool.query(
+      'UPDATE AMS_USERS SET USU_PASSWORD = ?, USU_RECOVERY_TOKEN = NULL WHERE USU_ID = ?',
+      [hashNewPassword, USU_ID]
+    );
+
+    return res.status(200).json({
+      data: {
+        content: null,
+        status: true,
+        message: 'Contraseña recuperada con éxito'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR RECUPERANDO CONTRASEÑA:', error);
+    return res.status(500).json({ errorMessage: 'Error interno al restablecer la contraseña' });
   }
 };
