@@ -673,7 +673,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
       secure: true,
       auth: {
         user: 'afanador1106@gmail.com',
-        pass: 'svpp xpra jqez xqzr' // ⚠️ TIP: En producción, guarda esto en un archivo .env
+        pass: 'vtsu hhnz cgvt yhwa' // correo AMS!!!*
       },
       tls: {
         rejectUnauthorized: false
