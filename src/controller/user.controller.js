@@ -666,9 +666,8 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
 
     const config = {
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      debug: true,
+      port: 465,
+      secure: true,
       auth: {
         user: 'afanador1106@gmail.com',
         pass: 'vtsuhhnzcgvtyhwa'
