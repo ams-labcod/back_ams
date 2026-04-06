@@ -79,6 +79,6 @@ router.post(
   create_criteria
 );
 
-router.get('/getAllCriteria', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCriteria)
+router.get('/getAllCriteria', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_STUDENT'), getAllCriteria)
 
 export default router;
