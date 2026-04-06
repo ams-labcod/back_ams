@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { check } from 'express-validator';
 
-import { create_person, login, getusers, userProfile, getUserProfileByUser, delete_person, update_person, EnviarCorreoRecuperacion, recuperarContrasena } from '../controller/user.controller.js';
+import { create_person, login, getusers, userProfile, getUserProfileByUser, delete_person, update_person, EnviarCorreoRecuperacion, recuperarContrasena, getByIdUsers } from '../controller/user.controller.js';
 
 import { validations } from '../middlewares/validations.js';
 
@@ -243,5 +243,7 @@ router.put('/users/:peo_id',verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTR
 router.post('/auth/correo-recuperar', EnviarCorreoRecuperacion);
 
 router.post('/auth/recuperar-contrasena', recuperarContrasena);
+
+router.get('/users/:peo_id', verifyJwt, getByIdUsers)
 
 export default router;
