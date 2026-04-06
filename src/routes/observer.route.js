@@ -10,6 +10,6 @@ const router = Router()
 
 router.post('/createObserver', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO'), saveObserver)
 
-router.get('/observer/:est_id/:per_id', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO'), getObserver);
+router.get('/observer/:est_id/:per_id', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_STUDENT'), getObserver);
 
 export default router

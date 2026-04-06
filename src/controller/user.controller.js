@@ -671,7 +671,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
       debug: true,
       auth: {
         user: 'afanador1106@gmail.com',
-        pass: 'vtsu hhnz cgvt yhwa'
+        pass: 'vtsuhhnzcgvtyhwa'
       }
     }
 
