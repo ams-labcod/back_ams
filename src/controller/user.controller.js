@@ -664,7 +664,8 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     );
 
     // Configuramos el enlace (¡Recuerda cambiarlo por la URL real de tu Frontend AMS!)
-    const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
+    //const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
+     const link = `https://localhost:3000/forgot-password/${token}`;
     
     // Configuración de Nodemailer
     const transporter = nodemailer.createTransport({
@@ -673,7 +674,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
       secure: true,
       auth: {
         user: 'afanador1106@gmail.com',
-        pass: 'svpp xpra jqez xqzr' // ⚠️ TIP: En producción, guarda esto en un archivo .env
+        pass: 'vtsu hhnz cgvt yhwa' // correo AMS!!!*
       },
       tls: {
         rejectUnauthorized: false
