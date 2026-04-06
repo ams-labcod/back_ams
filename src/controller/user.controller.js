@@ -667,15 +667,19 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     const config = {
       host: 'smtp.gmail.com',
       port: 587,
+      secure: false,
       auth: {
         user: 'afanador1106@gmail.com',
         pass: 'okpy ieuy agmm ynhz'
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     }
 
     const msj = {
       from: 'afanador1106@gmail.com', // desde donde se envia
-      to: `${peo_email} `,            // a donde se envia
+      to: `${peo_email}`,            // a donde se envia
       subject: 'Recuperación Contraseña AMS',
       text: `
         <h2>Recuperación de Contraseña</h2>
