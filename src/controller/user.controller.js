@@ -2,7 +2,7 @@ import { pool } from '../config/db.js'
 import { salt } from '../utils/salt.js'
 import bcrypt from 'bcrypt'
 import { generateJwt } from '../helpers/generate-jwt.js'
-import {generarTokenUnico} from '../utils/generateTokenUnique.js'
+import { generarTokenUnico } from '../utils/generateTokenUnique.js'
 import nodemailer from 'nodemailer'
 
 export const create_person = async (req, res) => {
@@ -631,9 +631,6 @@ export const update_person = async (req, res) => {
   }
 };
 
-
-
-
 //* Correo de recuperación
 export const EnviarCorreoRecuperacion = async (req, res) => {
   // Ahora recibimos el correo (PEO_EMAIL)
@@ -664,56 +661,51 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
       [token, USU_ID]
     );
 
-    // Configuramos el enlace (¡Recuerda cambiarlo por la URL real de tu Frontend AMS!)
     //const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
-     const link = `https://localhost:3000/forgot-password/${token}`;
-    
-    // Configuración de Nodemailer
-    const transporter = nodemailer.createTransport({
+    const link = `https://localhost:3000/forgot-password/${token}`;
+
+    const config = {
       service: "gmail",
       port: 465,
       secure: true,
+      debug: true,
+      secureConnection: false,
       auth: {
         user: 'afanador1106@gmail.com',
-        pass: 'vtsu hhnz cgvt yhwa' // correo AMS!!!*
+        pass: 'vtsu hhnz cgvt yhwa'
       },
       tls: {
-        rejectUnauthorized: false
+        rejectUnAuthorized: true
       }
-    });
+    }
 
-    const mailOptions = {
+    const msj = {
       from: 'afanador1106@gmail.com',
-      to: peo_email,
-      subject: "Recuperación de Contraseña",
-      html: `
+      to:  `${peo_email} `,
+      subject: 'Recuperación Contraseña AMS',
+      text: `
         <h2>Recuperación de Contraseña</h2>
         <p>Hola <b>${PEO_NAME_1}</b>,</p>
         <p>Has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace para crear una nueva:</p>
         <p><a href="${link}" style="color: blue; text-decoration: underline;">${link}</a></p>
         <p>Si no fuiste tú, ignora este correo.</p>
       `
-    };
+    }
+
+    const transporter = nodemailer.createTransport(config)
 
     // Enviamos el correo
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail(msj);
 
-    return res.status(200).json({
-      data: {
-        content: null,
-        status: true,
-        message: 'Correo de recuperación enviado con éxito'
-      }
-    });
+    return res.status(200).json({ mensaje: 'Correo enviado con el enlace para actualizar la contraseña' });
 
   } catch (error) {
+
     console.error('❌ ERROR ENVIANDO CORREO:', error);
+
     return res.status(500).json({ errorMessage: 'Error interno al enviar el correo de recuperación' });
   }
 };
-
-
-
 
 //* Recuperar contraseña
 export const recuperarContrasena = async (req, res) => {
