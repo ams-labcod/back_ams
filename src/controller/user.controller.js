@@ -3,6 +3,7 @@ import { salt } from '../utils/salt.js'
 import bcrypt from 'bcrypt'
 import { generateJwt } from '../helpers/generate-jwt.js'
 import {generarTokenUnico} from '../utils/generateTokenUnique.js'
+import nodemailer from 'nodemailer'
 
 export const create_person = async (req, res) => {
 
