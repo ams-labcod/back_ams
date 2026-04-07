@@ -65,7 +65,7 @@ export const createNote = async (req = request, res = response) => {
     }
 
     const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?)',
-      [eva_id, not_est_id, not_value, not_date, not_type, cou_notes_id])
+      [eva_id || null, not_est_id, not_value, not_date, not_type, cou_notes_id])
 
     const response = {
 
