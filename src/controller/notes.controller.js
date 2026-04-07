@@ -119,7 +119,9 @@ export const getStudentNotes = async (req, res) => {
         ev.EVA_NAME AS actividad,
         cn.COU_NOT_CRITERIA AS criterio,
         cn.COU_NOT_PERCENT AS porcentaje,
-        n.NOT_VALUE AS nota
+        n.NOT_VALUE AS nota,
+        n.NOT_DATE AS FechaNota,
+        n.NOT_TYPE AS TipoNota
       FROM AMS_ESTUDENTS e
       INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
       INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
