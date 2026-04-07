@@ -3,7 +3,10 @@ import { salt } from '../utils/salt.js'
 import bcrypt from 'bcrypt'
 import { generateJwt } from '../helpers/generate-jwt.js'
 import { generarTokenUnico } from '../utils/generateTokenUnique.js'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
+
+
+const resend = new Resend('re_2T18bpbc_4YtxDmYyj7txFPCKJKn6nCZA')
 
 export const create_person = async (req, res) => {
 
@@ -633,7 +636,7 @@ export const update_person = async (req, res) => {
 
 //* Correo de recuperación
 export const EnviarCorreoRecuperacion = async (req, res) => {
-  // Ahora recibimos el correo (PEO_EMAIL)
+
   const { peo_email } = req.body;
 
   try {
@@ -664,23 +667,11 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     //const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
     const link = `https://localhost:3000/forgot-password/${token}`;
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'afanador1106@gmail.com',
-        pass: 'okpy ieuy agmm ynhz'
-      }
-    })
-
-    await transporter.verify()
-
-    await transporter.sendMail({
-      from: 'afanador1106@gmail.com',
+    const { error } = await resend.emails.send({
+      from: 'onboarding@resend.dev',
       to: peo_email,
       subject: 'Recuperación de Contraseña AMS',
-      html: `                         
+      html: `
         <h2>Recuperación de Contraseña</h2>
         <p>Hola <b>${PEO_NAME_1}</b>,</p>
         <p>Has solicitado recuperar tu contraseña. Haz clic en el enlace para crear una nueva:</p>
@@ -688,6 +679,11 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
         <p>Si no fuiste tú, ignora este correo.</p>
       `
     })
+
+    if (error) {
+      console.error('❌ Error de Resend:', error);
+      return res.status(500).json({ errorMessage: error.message });
+    }
 
     return res.status(200).json({ mensaje: 'Correo enviado exitosamente' });
 
@@ -697,56 +693,56 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
 
     return res.status(500).json({ errorMessage: error.message });
   };
-} 
+}
 
-  //* Recuperar contraseña
-  export const recuperarContrasena = async (req, res) => {
-    const { token, usu_password } = req.body;
+//* Recuperar contraseña
+export const recuperarContrasena = async (req, res) => {
+  const { token, usu_password } = req.body;
 
-    try {
-      // Buscamos al usuario que tenga ese token de recuperación
-      const [usuario] = await pool.query(
-        'SELECT USU_ID FROM AMS_USERS WHERE USU_RECOVERY_TOKEN = ? LIMIT 1',
-        [token]
-      );
+  try {
+    // Buscamos al usuario que tenga ese token de recuperación
+    const [usuario] = await pool.query(
+      'SELECT USU_ID FROM AMS_USERS WHERE USU_RECOVERY_TOKEN = ? LIMIT 1',
+      [token]
+    );
 
-      if (usuario.length === 0) {
-        return res.status(400).json({ message: 'El token no es válido o ya ha sido utilizado' });
-      }
-
-      const { USU_ID } = usuario[0];
-
-      // Hasheamos la nueva contraseña asegurando que sea string
-      const hashNewPassword = await bcrypt.hash(String(usu_password).trim(), salt);
-
-      // Actualizamos la contraseña y anulamos el token pasándolo a NULL
-      await pool.query(
-        'UPDATE AMS_USERS SET USU_PASSWORD = ?, USU_RECOVERY_TOKEN = NULL WHERE USU_ID = ?',
-        [hashNewPassword, USU_ID]
-      );
-
-      return res.status(200).json({
-        data: {
-          content: null,
-          status: true,
-          message: 'Contraseña recuperada con éxito'
-        }
-      });
-
-    } catch (error) {
-      console.error('❌ ERROR RECUPERANDO CONTRASEÑA:', error);
-      return res.status(500).json({ errorMessage: 'Error interno al restablecer la contraseña' });
+    if (usuario.length === 0) {
+      return res.status(400).json({ message: 'El token no es válido o ya ha sido utilizado' });
     }
-  };
+
+    const { USU_ID } = usuario[0];
+
+    // Hasheamos la nueva contraseña asegurando que sea string
+    const hashNewPassword = await bcrypt.hash(String(usu_password).trim(), salt);
+
+    // Actualizamos la contraseña y anulamos el token pasándolo a NULL
+    await pool.query(
+      'UPDATE AMS_USERS SET USU_PASSWORD = ?, USU_RECOVERY_TOKEN = NULL WHERE USU_ID = ?',
+      [hashNewPassword, USU_ID]
+    );
+
+    return res.status(200).json({
+      data: {
+        content: null,
+        status: true,
+        message: 'Contraseña recuperada con éxito'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR RECUPERANDO CONTRASEÑA:', error);
+    return res.status(500).json({ errorMessage: 'Error interno al restablecer la contraseña' });
+  }
+};
 
 
-  export const getByIdUsers = async (req, res) => {
+export const getByIdUsers = async (req, res) => {
 
-    const { peo_id } = req.params
+  const { peo_id } = req.params
 
-    try {
+  try {
 
-      const [user] = await pool.query(`
+    const [user] = await pool.query(`
         SELECT 
         p.PEO_ID AS peo_id,
         u.USU_ROLE AS usu_role,
@@ -783,30 +779,30 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
       WHERE p.PEO_ID = ? LIMIT 1`, [peo_id])
 
 
-      if (user.length === 0) {
-        return res.status(404).json({ message: 'Usuario no encontrado en el sistema' });
-      }
-
-      return res.status(200).json({
-        data: {
-          content: user[0],
-          status: true,
-          message: 'Datos del usuario obtenidos correctamente'
-        }
-      });
-
-    } catch (error) {
-
-      console.error('❌ ERROR GET_USER_BY_ID:', error);
-      return res.status(500).json({
-        status: false,
-        message: 'Error interno del servidor al obtener el usuario',
-        error: error.message
-      });
-
-
-
+    if (user.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado en el sistema' });
     }
+
+    return res.status(200).json({
+      data: {
+        content: user[0],
+        status: true,
+        message: 'Datos del usuario obtenidos correctamente'
+      }
+    });
+
+  } catch (error) {
+
+    console.error('❌ ERROR GET_USER_BY_ID:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor al obtener el usuario',
+      error: error.message
+    });
+
 
 
   }
+
+
+}
