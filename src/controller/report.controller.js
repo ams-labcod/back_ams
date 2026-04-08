@@ -389,6 +389,7 @@ export const getTeacherGradebook = async (req, res) => {
         e.EST_LAST_NAME,
         ev.EVA_ID, 
         ev.EVA_NAME AS ACTIVIDAD, 
+        ev.EVA_DATE,
         cn.ID_COU_NOTES AS CRITERIO_ID,
         cn.COU_NOT_CRITERIA AS CRITERIO,
         cn.COU_NOT_PERCENT AS PORCENTAJE,
