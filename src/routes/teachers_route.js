@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import { getAllCourseNotes, getAllTeachers } from "../controller/teachers.controller.js";
+import { createCourseCriteria, getAllCourseNotes, getAllTeachers, updateCourseCriteria } from "../controller/teachers.controller.js";
 
 import { getCourseCriteria } from "../controller/teachers.controller.js";
 
@@ -22,14 +22,18 @@ router.get(
   getCourseCriteria
 );
 
+//* Crear
 router.post(
   '/teacher/criteria', 
   verifyJwt, 
   validateRoles('ROL_ADMINISTRATIVO','ROL_ADMIN','ROL_TEACHER'), 
-  saveCourseCriteria
+  createCourseCriteria
 );
 
 
 //* obtener todos los criterios
 router.get('/teacher/getAllCriteria', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_ADMIN', 'ROL_STUDENT'),getAllCourseNotes)
+
+//* Actulizar
+router.put('/course-criteria/:per_id', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'), updateCourseCriteria)
 export default router;
