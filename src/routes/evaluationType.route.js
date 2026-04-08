@@ -9,7 +9,7 @@ import { validateRoles } from "../middlewares/validateRols.js";
 const router = Router()
 
 //* CREERIA QUE EL TIPO DE EVALUACION LA CREA UN DOCENTE
-router.post('/createEvaluationType', verifyJwt, validateRoles('ROL_ADMIN','ROL_TEACHER'), createEvaluationType) 
+router.post('/createEvaluationType', verifyJwt, validateRoles('ROL_ADMINISTRATIVO','ROL_TEACHER'), createEvaluationType) 
 
 router.get('/getAllEvaluationType', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER', 'ROL_STUDENT'), getAllEvaluationType)
 
