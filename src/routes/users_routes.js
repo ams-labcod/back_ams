@@ -13,7 +13,7 @@ import { ValidationHalt } from 'express-validator/lib/base.js';
 
 const router = Router();
 // ,validateRolAdministrativo,
-router.post('/create_person',[
+router.post('/create_person', [
     check('usu_name1')
         .isString().withMessage('El primer nombre debe ser un Texto')
         .notEmpty().withMessage('El primer nombre es requerido'),
@@ -48,25 +48,22 @@ router.post('/create_person',[
         .notEmpty().withMessage('La identificación es requerida'),
     // .custom(existIdentificacion),
 
-    check('usu_level')
-        .custom((value, { req }) => {
+    check('usu_level').custom((value, { req }) => {
 
-            const tipo = req.body.usu_tp_person;
+        const tipo = req.body.usu_tp_person;
 
-            if (tipo === 'ADMINISTRATIVO') {
-                return true; // no aplica
+        // 2. Si es ESTUDIANTE, le aplicamos la regla estricta
+        if (tipoPersona === 'ESTUDIANTE') {
+            const nivelesPermitidos = ['PREESCOLAR', 'BASICA', 'SECUNDARIA'];
+            if (!nivelesPermitidos.includes(value?.toUpperCase())) {
+                throw new Error('El nivel para el estudiante debe ser: PREESCOLAR, BASICA o SECUNDARIA');
             }
+        }
 
-            if (!value) {
-                throw new Error('El nivel es requerido');
-            }
-
-            if (!['PREESCOLAR', 'BASICA', 'SECUNDARIA'].includes(value)) {
-                throw new Error('El nivel debe ser: PREESCOLAR, BASICA o SECUNDARIA');
-            }
-
-            return true;
-        }),
+        // 3. Si NO es estudiante (es profesor o administrativo), devolvemos true 
+        // para que pase sin importar si dice "MAESTRIA", "DOCTORADO", etc.
+        return true;
+    }),
 
 
     check('usu_tp_reg')
@@ -229,16 +226,16 @@ router.post(
     login
 );
 
-router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO', 'ROL_TEACHER'), getusers);
+router.get('/get_users', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO', 'ROL_TEACHER'), getusers);
 
 //Ver perfil (persona verificado - privada )-- 
 router.get('/users/profile', verifyJwt, userProfile)
 
 router.get('/users/:id_users', verifyJwt, getUserProfileByUser)
 
-router.delete('/users/:peo_id', verifyJwt,  validateRoles('ROL_ADMINISTRATIVO','ROL_ADMIN'), delete_person)
+router.delete('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMINISTRATIVO', 'ROL_ADMIN'), delete_person)
 
-router.put('/users/:peo_id',verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
+router.put('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
 
 router.post('/auth/correo-recuperar', EnviarCorreoRecuperacion);
 

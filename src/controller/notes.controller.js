@@ -45,17 +45,17 @@ export const getAllNotes = async (req = request, res = response) => {
 
 export const createNote = async (req = request, res = response) => {
 
-  const { eva_id, not_est_id, not_value, not_date, not_type = 'NORMAL', cou_notes_id = null } = req.body
+  const { eva_id, not_est_id, not_value, not_date, not_type = 'NORMAL', cou_notes_id = null, not_average } = req.body
 
   try {
 
     const [validateStudent] = await pool.query('SELECT est_id FROM AMS_ESTUDENTS WHERE est_id = ? ', [not_est_id])
 
-    // const [validateEvaluation] = await pool.query('SELECT eva_id FROM AMS_EVALUATION WHERE eva_id = ?', [eva_id])
+    const [validateEvaluation] = await pool.query('SELECT eva_id FROM AMS_EVALUATION WHERE eva_id = ?', [eva_id])
 
     if (validateStudent.length === 0) return res.status(400).json({ errorMessage: 'El estudiante no existe' })
 
-    // if (validateEvaluation.length === 0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
+    if (validateEvaluation.length === 0) return res.status(400).json({ errorMessage: 'La evaluación no existe' })
 
     if (cou_notes_id) {
       const [validateCriteria] = await pool.query('SELECT ID_COU_NOTES FROM AMS_COURSE_NOTES WHERE ID_COU_NOTES = ?', [cou_notes_id]);
@@ -64,8 +64,8 @@ export const createNote = async (req = request, res = response) => {
       }
     }
 
-    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?)',
-      [eva_id || null, not_est_id, not_value, not_date, not_type, cou_notes_id])
+    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?,?)',
+      [eva_id || null, not_est_id, not_value, not_date, not_type, cou_notes_id, not_average || null])
 
     const response = {
 
@@ -117,11 +117,13 @@ export const getStudentNotes = async (req, res) => {
         cs.COS_SUBJECT_NAME AS materia,
         ev.EVA_ID AS id_evaluacion,
         ev.EVA_NAME AS actividad,
+        eva.EVA_DATE AS FechaEvaluacion,
         cn.COU_NOT_CRITERIA AS criterio,
         cn.COU_NOT_PERCENT AS porcentaje,
         n.NOT_VALUE AS nota,
         n.NOT_DATE AS FechaNota,
-        n.NOT_TYPE AS TipoNota
+        n.NOT_TYPE AS TipoNota,
+        n.NOT_AVERAGE AS Promedio
       FROM AMS_ESTUDENTS e
       INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
       INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
