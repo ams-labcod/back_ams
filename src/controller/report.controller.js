@@ -464,6 +464,7 @@ export const getTeacherGradebook = async (req, res) => {
             id_evaluacion: row.EVA_ID,
             actividad: row.ACTIVIDAD,
             criterio: row.CRITERIO,
+            fechaEvaluacion: row.FechaEvaluacion,
             porcentaje: row.PORCENTAJE,
             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
             tipo_nota: row.NOT_TYPE,

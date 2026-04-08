@@ -31,5 +31,5 @@ router.post(
 
 
 //* obtener todos los criterios
-router.get('/teacher/getAllCriteria', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_ADMIN'),getAllCourseNotes)
+router.get('/teacher/getAllCriteria', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO','ROL_ADMIN', 'ROL_STUDENT'),getAllCourseNotes)
 export default router;

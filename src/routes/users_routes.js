@@ -49,18 +49,19 @@ router.post('/create_person', [
     // .custom(existIdentificacion),
 
     check('usu_level').custom((value, { req }) => {
+        
+        const tipoPersona = req.body.usu_tp_person ? req.body.usu_tp_person.trim().toUpperCase() : '';
 
-        const tipo = req.body.usu_tp_person;
-
-        // 2. Si es ESTUDIANTE, le aplicamos la regla estricta
         if (tipoPersona === 'ESTUDIANTE') {
             const nivelesPermitidos = ['PREESCOLAR', 'BASICA', 'SECUNDARIA'];
+
+        
             if (!nivelesPermitidos.includes(value?.toUpperCase())) {
                 throw new Error('El nivel para el estudiante debe ser: PREESCOLAR, BASICA o SECUNDARIA');
             }
         }
 
-        // 3. Si NO es estudiante (es profesor o administrativo), devolvemos true 
+        // Si NO es estudiante (es DOCENTE o ADMINISTRATIVO), devolvemos true 
         // para que pase sin importar si dice "MAESTRIA", "DOCTORADO", etc.
         return true;
     }),
