@@ -45,7 +45,7 @@ export const getAllNotes = async (req = request, res = response) => {
 
 export const createNote = async (req = request, res = response) => {
 
-  const { eva_id, not_est_id, not_value, not_date, not_type = 'NORMAL', cou_notes_id = null } = req.body
+  const { eva_id, not_est_id, not_value, not_date, not_type = 'NORMAL', cou_notes_id = null, not_average } = req.body
 
   try {
 
@@ -64,8 +64,8 @@ export const createNote = async (req = request, res = response) => {
       }
     }
 
-    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?)',
-      [eva_id || null, not_est_id, not_value, not_date, not_type, cou_notes_id])
+    const [create] = await pool.query('INSERT INTO AMS_NOTES (eva_id,not_est_id,not_value,not_date, not_type, cou_notes_id) VALUES (?,?,?,?,?,?,?)',
+      [eva_id || null, not_est_id, not_value, not_date, not_type, cou_notes_id, not_average || null])
 
     const response = {
 
@@ -122,7 +122,8 @@ export const getStudentNotes = async (req, res) => {
         cn.COU_NOT_PERCENT AS porcentaje,
         n.NOT_VALUE AS nota,
         n.NOT_DATE AS FechaNota,
-        n.NOT_TYPE AS TipoNota
+        n.NOT_TYPE AS TipoNota,
+        n.NOT_AVERAGE AS Promedio
       FROM AMS_ESTUDENTS e
       INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
       INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
