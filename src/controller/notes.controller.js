@@ -117,7 +117,7 @@ export const getStudentNotes = async (req, res) => {
         cs.COS_SUBJECT_NAME AS materia,
         ev.EVA_ID AS id_evaluacion,
         ev.EVA_NAME AS actividad,
-        eva.EVA_DATE AS FechaEvaluacion,
+        ev.EVA_DATE AS FechaEvaluacion,
         cn.COU_NOT_CRITERIA AS criterio,
         cn.COU_NOT_PERCENT AS porcentaje,
         n.NOT_VALUE AS nota,
