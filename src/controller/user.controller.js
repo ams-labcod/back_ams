@@ -668,7 +668,7 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     const link = `https://localhost:3000/forgot-password/${token}`;
 
     const { error } = await resend.emails.send({
-      from: 'alejandrocorralesb.com',
+      from: 'AMS Sistema <noreply@alejandrocorralesb.com>',
       to: peo_email,
       subject: 'Recuperación de Contraseña AMS',
       html: `
