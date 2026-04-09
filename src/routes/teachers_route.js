@@ -6,7 +6,7 @@ import { createCourseCriteria, getAllCourseNotes, getAllTeachers, updateCourseCr
 
 import { getCourseCriteria } from "../controller/teachers.controller.js";
 
-import { saveCourseCriteria } from "../controller/teachers.controller.js";
+// import { saveCourseCriteria } from "../controller/teachers.controller.js";
 
 import { validateRoles } from "../middlewares/validateRols.js";
 
