@@ -376,6 +376,7 @@ export const getTeacherGradebook = async (req, res) => {
     // 4️⃣ Consulta principal
     const [rows] = await pool.query(
       `SELECT 
+       t.TEA_PEO_ID AS ID,
         t.TEA_NAME, 
         t.TEA_LAST_NAME,
         c.COU_ID, 
@@ -429,7 +430,7 @@ export const getTeacherGradebook = async (req, res) => {
 
     // 5️⃣ Transformar SQL plano a JSON
     const groupedData = {};
-    const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME}`;
+    const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME} ${rows[0].TEA_PEO_ID}`;
 
     rows.forEach(row => {
 

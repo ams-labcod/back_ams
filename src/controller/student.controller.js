@@ -166,3 +166,84 @@ export const getMyGrades = async (req, res) => {
     return res.status(500).json({ errorMessage: 'Error en el servidor al obtener las notas' });
   }
 };
+
+
+
+
+//* calcular puesto - estudiante
+export const getGradesForRanking = async (req, res) => {
+  try {
+    // 1. Recibimos el curso y el periodo desde la URL (?cou_id=X&per_id=Y)
+    const { cou_id, per_id } = req.query;
+
+    if (!cou_id || !per_id) {
+      return res.status(400).json({
+        status: false,
+        message: 'Debe especificar el curso (cou_id) y el periodo (per_id)'
+      });
+    }
+
+    // 2. Consulta SQL: Unimos Estudiantes, Materias, Evaluaciones, Notas y Criterios
+    const [rows] = await pool.query(
+      `SELECT 
+        e.EST_ID AS id_estudiante,
+        cn.COU_NOT_CRITERIA AS criterio,
+        cn.COU_NOT_PERCENT AS porcentaje,
+        n.NOT_VALUE AS nota
+      FROM AMS_ESTUDENTS e
+      INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
+      INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
+      INNER JOIN AMS_COURSE_NOTES cn ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
+      INNER JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
+      WHERE e.COU_ID = ? AND ev.EVA_PER_ID = ?
+      ORDER BY e.EST_ID ASC`,
+      [cou_id, per_id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: 'No se encontraron notas para este curso en el periodo indicado.'
+      });
+    }
+
+    // 3. Transformación de los datos al JSON solicitado
+    const groupedData = {};
+
+    rows.forEach(row => {
+      // Si el estudiante aún no existe en nuestro objeto, lo creamos
+      if (!groupedData[row.id_estudiante]) {
+        groupedData[row.id_estudiante] = {
+          id_estudiante: row.id_estudiante,
+          notas: []
+        };
+      }
+
+      // Insertamos la nota en el arreglo del estudiante correspondiente
+      groupedData[row.id_estudiante].notas.push({
+        criterio: row.criterio,
+        porcentaje: row.porcentaje,
+        nota: row.nota !== null ? Number(row.nota) : 0 // Convertimos a número por seguridad
+      });
+    });
+
+    // 4. Convertimos el objeto agrupado en un arreglo plano
+    const finalArray = Object.values(groupedData);
+
+    return res.status(200).json({
+      data: {
+        content: finalArray,
+        status: true,
+        message: 'Notas obtenidas correctamente para el cálculo de puestos'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR OBTENIENDO NOTAS PARA RANKING:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor al obtener las notas',
+      error: error.message
+    });
+  }
+};
