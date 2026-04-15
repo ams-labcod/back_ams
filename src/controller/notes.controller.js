@@ -161,6 +161,7 @@ export const getStudentNotes = async (req, res) => {
         groupedData[row.id_materia].notas.push({
           id_evaluacion: row.id_evaluacion,
           actividad: row.actividad,
+          fechaEvaluacion: row.FechaEvaluacion,
           criterio: row.criterio || "Sin criterio",
           porcentaje: row.porcentaje || 0,
           nota: row.nota !== null ? row.nota : null // Null si el profe aún no ha calificado

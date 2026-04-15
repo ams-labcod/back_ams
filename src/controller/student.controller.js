@@ -186,6 +186,7 @@ export const getGradesForRanking = async (req, res) => {
     // 2. Consulta SQL: Unimos Estudiantes, Materias, Evaluaciones, Notas y Criterios
     const [rows] = await pool.query(
       `SELECT 
+        e.EST_PEO_ID AS peo_id,
         e.EST_ID AS id_estudiante,
         cn.COU_NOT_CRITERIA AS criterio,
         cn.COU_NOT_PERCENT AS porcentaje,
