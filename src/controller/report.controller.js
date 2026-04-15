@@ -430,7 +430,9 @@ export const getTeacherGradebook = async (req, res) => {
 
     // 5️⃣ Transformar SQL plano a JSON
     const groupedData = {};
-    const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME} ${rows[0].TEA_PEO_ID}`;
+    const profesorInfo = `${rows[0].TEA_NAME} ${rows[0].TEA_LAST_NAME}`;
+
+    const idProfesor = rows[0].ID
 
     rows.forEach(row => {
 
@@ -487,6 +489,7 @@ export const getTeacherGradebook = async (req, res) => {
     // 7️⃣ Respuesta final
     const response = {
       content: {
+        idProfesor: idProfesor,
         profesor: profesorInfo,
         periodo_consultado: per_id,
         criterios_evaluacion:
