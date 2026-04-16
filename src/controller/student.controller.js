@@ -216,6 +216,7 @@ export const getGradesForRanking = async (req, res) => {
       if (!groupedData[row.id_estudiante]) {
         groupedData[row.id_estudiante] = {
           id_estudiante: row.id_estudiante,
+          peo_id: row.peo_id,
           notas: []
         };
       }
