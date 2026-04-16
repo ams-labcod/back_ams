@@ -28,6 +28,8 @@ import teachersRoute from './routes/teachers_route.js'
 
 import observerRoute from './routes/observer.route.js'
 
+import recoveryNote from './routes/recovery.notes.route.js'
+
 
 import cors from 'cors';    
 
@@ -64,4 +66,5 @@ app.use('/', logrosRoutes)
 app.use('/', studentRoute)
 app.use('/', teachersRoute)
 app.use('/', observerRoute)
+app.use('/', recoveryNote)
 export default app;
