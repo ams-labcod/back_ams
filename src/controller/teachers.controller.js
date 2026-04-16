@@ -154,18 +154,18 @@ export const createCourseCriteria = async (req, res) => {
         await connection.beginTransaction();
 
         // 3. Validar que NO existan criterios previos
-        const [existingCriteria] = await connection.query(
-            'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? LIMIT 1',
-            [per_id, tea_id]
-        );
+        // const [existingCriteria] = await connection.query(
+        //     'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? LIMIT 1',
+        //     [per_id, tea_id]
+        // );
 
-        if (existingCriteria.length > 0) {
-            await connection.rollback();
-            return res.status(409).json({
-                status: false,
-                message: 'Ya existen criterios de evaluación configurados para este periodo. Use la opción de actualizar.'
-            });
-        }
+        // if (existingCriteria.length > 0) {
+        //     await connection.rollback();
+        //     return res.status(409).json({
+        //         status: false,
+        //         message: 'Ya existen criterios de evaluación configurados para este periodo. Use la opción de actualizar.'
+        //     });
+        // }
 
         // 4. Insertar los 4 criterios
         for (const item of criterios) {
