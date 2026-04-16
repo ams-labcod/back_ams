@@ -416,7 +416,7 @@ export const getTeacherGradebook = async (req, res) => {
         AND e.EST_ID = n.NOT_EST_ID
   LEFT JOIN AMS_COURSE_NOTES cn
   ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
-      WHERE cs.COS_STATE = 'A' AND t.TEA_PEO_ID = ?'
+      WHERE cs.COS_STATE = 'A' AND t.TEA_PEO_ID = ?
       ORDER BY 
         c.COU_LEVEL,
         c.COU_NAME_TEACH,
