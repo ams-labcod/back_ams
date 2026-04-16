@@ -293,15 +293,17 @@ export const updateCourseCriteria = async (req, res) => {
 export const getCourseCriteria = async (req, res) => {
     try {
         const tea_id = req.user.tea_peo_id;
-        const { per_id } = req.params; // Lo recibimos por la URL
+        const { per_id, cou_id } = req.params; // Lo recibimos por la URL
 
         if (!tea_id) {
             return res.status(403).json({ message: 'Acceso denegado.' });
         }
 
+        if (!cou_id) return res.status(400).json({errorMessage: 'Debe especificar el ID del Curso para obtener los criterios'})
+
         const [criterios] = await pool.query(
-            'SELECT COU_NOT_CRITERIA AS nombre, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
-            [per_id, tea_id]
+            'SELECT COU_NOT_CRITERIA AS nombre, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? AND COU_ID = ?',
+            [per_id, tea_id, cou_id]
         );
 
         // Si no tiene criterios guardados, devolvemos un arreglo vacío para que el frontend ponga 25% por defecto

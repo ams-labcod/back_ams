@@ -15,8 +15,9 @@ const router = Router()
 //* PROFESOR
 router.get('/getAllTeachers', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllTeachers )
 
+//* Obtener criteria curso
 router.get(
-  '/teacher/criteria/:per_id', 
+  '/teacher/criteria/:per_id/:cou_id', 
   verifyJwt, 
   validateRoles('ROL_ADMINISTRATIVO','ROL_ADMIN','ROL_TEACHER'), 
   getCourseCriteria
