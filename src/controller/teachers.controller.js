@@ -150,20 +150,6 @@ export const createCourseCriteria = async (req, res) => {
             });
         }
 
-        //validamos el curso 
-        const [validateCourse] = await connection.query(
-            'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? AND COU_ID = ? LIMIT 1',
-            [per_id, tea_id, cou_id]
-        )
-
-        if (existingCriteria.length > 0) {
-            await connection.rollback();
-            return res.status(409).json({
-                status: false,
-                message: 'Ya existen criterios de evaluación configurados para este curso en este periodo. Use la opción de actualizar.'
-            });
-        }
-
         connection = await pool.getConnection();
         await connection.beginTransaction();
 
@@ -185,7 +171,7 @@ export const createCourseCriteria = async (req, res) => {
         for (const item of criterios) {
             await connection.query(
                 'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_ID, COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?, ?, ?, ?,?)',
-                [per_id,cou_id, item.nombre, item.porcentaje, tea_id]
+                [per_id, cou_id, item.nombre, item.porcentaje, tea_id]
             );
         }
 
@@ -299,7 +285,7 @@ export const getCourseCriteria = async (req, res) => {
             return res.status(403).json({ message: 'Acceso denegado.' });
         }
 
-        if (!cou_id) return res.status(400).json({errorMessage: 'Debe especificar el ID del Curso para obtener los criterios'})
+        if (!cou_id) return res.status(400).json({ errorMessage: 'Debe especificar el ID del Curso para obtener los criterios' })
 
         const [criterios] = await pool.query(
             'SELECT COU_NOT_CRITERIA AS nombre, COU_NOT_PERCENT AS porcentaje FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? AND COU_ID = ?',
