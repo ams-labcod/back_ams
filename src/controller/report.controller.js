@@ -342,7 +342,7 @@ export const getAllCourseDirectors = async (req, res) => {
 export const getTeacherGradebook = async (req, res) => {
   try {
 
-    const tea_id = req.users.tea_peo_id
+    const tea_id = req.user.tea_peo_id
 
     if (!tea_id) return res.status(404).json({errorMessage: 'No se identifico al docente'})
 
