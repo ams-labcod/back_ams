@@ -9,3 +9,5 @@ const router = Router()
 
 
 router.post('/recoveryNote', verifyJwt,validateRoles('ROL_ADMINISTRATIVO', 'ROL_TEACHER'), saveRecoveryNote)
+
+export default router
