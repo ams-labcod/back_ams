@@ -136,17 +136,31 @@ export const createCourseCriteria = async (req, res) => {
             return res.status(403).json({ message: 'Solo los docentes pueden configurar estos criterios.' });
         }
 
-        const { per_id, criterios } = req.body;
+        const { per_id, criterios, cou_id } = req.body;
 
         // 2. Validación de datos
-        if (!per_id || !criterios || criterios.length !== 4) {
-            return res.status(400).json({ message: 'Debe enviar el periodo y exactamente 4 criterios.' });
+        if (!per_id || !criterios || !cou_id || criterios.length !== 4) {
+            return res.status(400).json({ message: 'Debe enviar el periodo, el curso y exactamente 4 criterios.' });
         }
 
         const sumaTotal = criterios.reduce((acum, actual) => acum + Number(actual.porcentaje), 0);
         if (sumaTotal !== 100) {
             return res.status(400).json({
                 message: `Los porcentajes deben sumar exactamente 100%. Actualmente suman ${sumaTotal}%.`
+            });
+        }
+
+        //validamos el curso 
+        const [validateCourse] = await connection.query(
+            'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ? AND COU_ID = ? LIMIT 1',
+            [per_id, tea_id, cou_id]
+        )
+
+        if (existingCriteria.length > 0) {
+            await connection.rollback();
+            return res.status(409).json({
+                status: false,
+                message: 'Ya existen criterios de evaluación configurados para este curso en este periodo. Use la opción de actualizar.'
             });
         }
 
@@ -170,8 +184,8 @@ export const createCourseCriteria = async (req, res) => {
         // 4. Insertar los 4 criterios
         for (const item of criterios) {
             await connection.query(
-                'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?, ?, ?, ?)',
-                [per_id, item.nombre, item.porcentaje, tea_id]
+                'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_ID, COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?, ?, ?, ?,?)',
+                [per_id,cou_id, item.nombre, item.porcentaje, tea_id]
             );
         }
 
