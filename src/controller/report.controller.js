@@ -483,7 +483,7 @@ export const getTeacherGradebook = async (req, res) => {
             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
             tipo_nota: row.NOT_TYPE,
             criterio_nota_id : row.COU_NOTES_ID,
-            id_nota_recuperacion: row_REC_ID,
+            id_nota_recuperacion: row.REC_ID,
             nota_recuperacion: row.REC_VALUE,
             nota_anterior: row.REC_OLD_VALUE,
             observacion_recuperacion: row.REC_OBSERVATION
