@@ -400,7 +400,11 @@ export const getTeacherGradebook = async (req, res) => {
         cn.COU_NOT_PERCENT AS PORCENTAJE,
         n.NOT_VALUE,
         n.NOT_TYPE,
-        n.COU_NOTES_ID
+        n.COU_NOTES_ID,
+        rn.REC_ID,
+        rn.REC_VALUE,
+        rn.REC_OLD_VALUE,
+        rn.REC_OBSERVATION
       FROM AMS_COURSE_SUBJECT cs
       INNER JOIN AMS_TEACHERS t 
         ON cs.TEA_PEO_ID = t.TEA_PEO_ID
@@ -416,6 +420,9 @@ export const getTeacherGradebook = async (req, res) => {
         AND e.EST_ID = n.NOT_EST_ID
   LEFT JOIN AMS_COURSE_NOTES cn
   ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
+  LEFT JOIN AMS_RECOVERY_NOTES rn
+  ON ev.EVA_ID = rn.EVA_ID
+  AND e.EST_ID = rn.EST_ID
       WHERE cs.COS_STATE = 'A' AND t.TEA_PEO_ID = ?
       ORDER BY 
         c.COU_LEVEL,
@@ -475,7 +482,11 @@ export const getTeacherGradebook = async (req, res) => {
             porcentaje: row.PORCENTAJE,
             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
             tipo_nota: row.NOT_TYPE,
-            criterio_nota_id : row.COU_NOTES_ID
+            criterio_nota_id : row.COU_NOTES_ID,
+            id_nota_recuperacion: row_REC_ID,
+            nota_recuperacion: row.REC_VALUE,
+            nota_anterior: row.REC_OLD_VALUE,
+            observacion_recuperacion: row.REC_OBSERVATION
           });
 
         }

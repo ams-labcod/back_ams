@@ -35,10 +35,7 @@ export const saveRecoveryNote = async (req, res) => {
         connection = await pool.getConnection();
 
         // 4. Insertar la nota en la tabla
-        await connection.query(
-            `INSERT INTO AMS_RECOVERY_NOTES 
-            (EST_ID, COS_ID, PER_ID, COU_ID, ID_COU_NOTES, EVA_ID, REC_VALUE, REC_OLD_VALUE, REC_OBSERVATION) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        await connection.query('INSERT INTO AMS_RECOVERY_NOTES (EST_ID, COS_ID, PER_ID, COU_ID, ID_COU_NOTES, EVA_ID, REC_VALUE, REC_OLD_VALUE, REC_OBSERVATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 est_id, 
                 cos_id, 

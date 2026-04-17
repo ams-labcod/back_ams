@@ -123,7 +123,11 @@ export const getStudentNotes = async (req, res) => {
         n.NOT_VALUE AS nota,
         n.NOT_DATE AS FechaNota,
         n.NOT_TYPE AS TipoNota,
-        n.NOT_AVERAGE AS Promedio
+        n.NOT_AVERAGE AS Promedio,
+        rn.REC_ID AS ID_nota_recuperacion,
+        rn.REC_VALUE AS nota_recuperacion,
+        rn.REC_OLD_VALUE AS nota_anterior,
+        rn.REC_OBSERVATION AS observacion_recuperacion
       FROM AMS_ESTUDENTS e
       INNER JOIN AMS_COURSE_SUBJECT cs ON e.COU_ID = cs.COU_ID
       INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
@@ -131,6 +135,7 @@ export const getStudentNotes = async (req, res) => {
       LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
       -- Unimos los criterios (DBA, DB, etc.) si existen
       LEFT JOIN AMS_COURSE_NOTES cn ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
+      LEFT JOIN AMS_RECOVERY_NOTES rn ON ev.EVA_ID = rn.EVA_ID AND e.EST_ID = rn.EST_ID
       WHERE e.EST_PEO_ID = ? AND ev.EVA_PER_ID = ? AND cs.COS_STATE = 'A'
       ORDER BY cs.COS_SUBJECT_NAME ASC, ev.EVA_DATE ASC`,
       [peo_id, per_id]
@@ -164,7 +169,11 @@ export const getStudentNotes = async (req, res) => {
           fechaEvaluacion: row.FechaEvaluacion,
           criterio: row.criterio || "Sin criterio",
           porcentaje: row.porcentaje || 0,
-          nota: row.nota !== null ? row.nota : null // Null si el profe aún no ha calificado
+          nota: row.nota !== null ? row.nota : null, // Null si el profe aún no ha calificado
+          ID_nota_recuperacion: row_ID_nota_recuperacion,
+          notaRecuperacion: row.nota_recuperacion,
+          notaAnterior: row.nota_anterior,
+          observacionRecuperacion: row.observacion_recuperacion
         });
       }
     });
