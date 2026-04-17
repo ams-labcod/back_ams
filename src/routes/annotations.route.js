@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { verifyJwt } from '../middlewares/verifyToken.js';
 
-import {createAnnotation, getAnnotations, syncAssistanceSummary} from '../controller/annotations.controller.js'
+import {createAnnotation, getAnnotations, getAssistanceSummaries, syncAssistanceSummary} from '../controller/annotations.controller.js'
 
 import { validateRoles } from "../middlewares/validateRols.js";
 
