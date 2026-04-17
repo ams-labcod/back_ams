@@ -139,7 +139,7 @@ export const createCourseCriteria = async (req, res) => {
         const { per_id, criterios, cou_id, cos_id } = req.body;
 
         // 2. Validación de datos
-        if (!per_id || !criterios || !cou_id || cos_id || criterios.length !== 4) {
+        if (!per_id || !criterios || !cou_id || !cos_id || criterios.length !== 4) {
             return res.status(400).json({ message: 'Debe enviar el periodo, el curso y exactamente 4 criterios.' });
         }
 
