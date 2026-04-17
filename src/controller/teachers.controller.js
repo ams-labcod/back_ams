@@ -155,9 +155,8 @@ export const createCourseCriteria = async (req, res) => {
 
         // 4. Insertar los 4 criterios
         for (const item of criterios) {
-            await connection.query(
-                'INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_ID,COS_ID COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?,?, ?, ?, ?,?)',
-                [per_id, cou_id,cos_id, item.nombre, item.porcentaje, tea_id]
+            await connection.query('INSERT INTO AMS_COURSE_NOTES (PER_ID, COU_ID,COS_ID COU_NOT_CRITERIA, COU_NOT_PERCENT, TEA_ID) VALUES (?,?, ?, ?, ?,?)',
+                [per_id, cou_id, cos_id, item.nombre, item.porcentaje, tea_id]
             );
         }
 
