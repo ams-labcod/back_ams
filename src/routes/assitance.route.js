@@ -16,6 +16,4 @@ router.get('/getAllAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN
 //POST ASSISTENCIA
 router.post('/createAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), createAssitance)
 
-
-
 export default router
