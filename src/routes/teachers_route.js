@@ -17,7 +17,7 @@ router.get('/getAllTeachers', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN',
 
 //* Obtener criteria curso
 router.get(
-  '/teacher/criteria/:per_id/:cou_id', 
+  '/teacher/criteria/:per_id/:cou_id',  //* le agregamos el criterio(ams_coruse_notes) y (ams_course_subject)
   verifyJwt, 
   validateRoles('ROL_ADMINISTRATIVO','ROL_ADMIN','ROL_TEACHER'), 
   getCourseCriteria
