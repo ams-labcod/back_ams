@@ -4,7 +4,7 @@ import { verifyJwt } from '../middlewares/verifyToken.js';
 
 import { validateRoles } from "../middlewares/validateRols.js";
 
-import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook, getMyDirector } from "../controller/report.controller.js";
+import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook, getMyDirector, getAdminGradebook } from "../controller/report.controller.js";
 
 const router = Router()
 
@@ -31,5 +31,7 @@ router.get(
 );
 
 router.get('/teacher/gradebook', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO', 'ROL_ADMIN', 'ROL_STUDENT'), getTeacherGradebook)
+
+router.get('/admin/gradebook', verifyJwt, validateRoles('ROL_ADMIN'), getAdminGradebook);
 
 export default router
