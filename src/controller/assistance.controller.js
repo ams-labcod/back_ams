@@ -27,7 +27,7 @@ export const getAllAssitance = async (req = request, res = response) => {
       INNER JOIN AMS_COURSE_SUBJECT cs ON a.COS_ID = cs.COS_ID
       INNER JOIN AMS_COURSES c ON cs.COU_ID = c.COU_ID
       INNER JOIN AMS_ESTUDENTS e ON a.EST_ID = e.EST_ID
-      LEFT JOIN AMS_ASSISNTACE_SUMARY ass ON a.ASS_SUM_ID = ass.ASS_SUM_ID
+      LEFT JOIN AMS_ASSISTANCE_SUMMARY ass ON a.ASS_SUM_ID = ass.ASS_SUM_ID
       ORDER BY a.ASS_DATE DESC, c.COU_LEVEL, cs.COS_SUBJECT_NAME`
     );
 

@@ -170,7 +170,7 @@ export const getStudentNotes = async (req, res) => {
           criterio: row.criterio || "Sin criterio",
           porcentaje: row.porcentaje || 0,
           nota: row.nota !== null ? row.nota : null, // Null si el profe aún no ha calificado
-          ID_nota_recuperacion: row_ID_nota_recuperacion,
+          ID_nota_recuperacion: row.ID_nota_recuperacion,
           notaRecuperacion: row.nota_recuperacion,
           notaAnterior: row.nota_anterior,
           observacionRecuperacion: row.observacion_recuperacion
