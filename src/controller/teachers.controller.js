@@ -266,10 +266,6 @@ export const getCourseCriteria = async (req, res) => {
         const tea_id = req.user.tea_peo_id;
         const { per_id, cou_id, cos_id, id_cou_notes } = req.params; // Lo recibimos por la URL
 
-        if (!tea_id) {
-            return res.status(403).json({ message: 'Acceso denegado.' });
-        }
-
         if (!cou_id) return res.status(400).json({ errorMessage: 'Debe especificar el ID del Curso para obtener los criterios' })
 
         const [criterios] = await pool.query(
