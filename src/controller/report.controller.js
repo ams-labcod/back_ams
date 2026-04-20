@@ -531,3 +531,170 @@ export const getTeacherGradebook = async (req, res) => {
 
   }
 };
+
+
+
+//* Planilla general para Administradores (Toda la institución)
+export const getAdminGradebook = async (req, res) => {
+  try {
+    // 1️⃣ Periodo desde la URL
+    const { per_id } = req.query;
+
+    if (!per_id) {
+      return res.status(400).json({
+        message: 'Debe especificar el periodo académico (?per_id=X)'
+      });
+    }
+
+    // 2️⃣ Validar periodo
+    const [validatePeriod] = await pool.query(
+      'SELECT PER_ID FROM AMS_PERIOD WHERE PER_ID = ?',
+      [per_id]
+    );
+
+    if (validatePeriod.length === 0) {
+      return res.status(400).json({
+        errorMessage: 'El periodo ingresado no existe'
+      });
+    }
+
+    // 3️⃣ Consulta principal (🔥 SIN FILTRO DE PROFESOR)
+    const [rows] = await pool.query(
+      `SELECT 
+        t.TEA_PEO_ID AS ID_PROFESOR,
+        t.TEA_NAME, 
+        t.TEA_LAST_NAME,
+        c.COU_ID, 
+        c.COU_LEVEL, 
+        c.COU_NAME_TEACH AS CURSO,
+        cs.COS_ID, 
+        cs.COS_SUBJECT_NAME AS ASIGNATURA,
+        e.EST_ID, 
+        e.EST_IDENTIFICATION, 
+        e.EST_NAME, 
+        e.EST_LAST_NAME,
+        ev.EVA_ID, 
+        ev.EVA_NAME AS ACTIVIDAD, 
+        ev.EVA_DATE AS FechaEvaluacion,
+        cn.ID_COU_NOTES AS CRITERIO_ID,
+        cn.COU_NOT_CRITERIA AS CRITERIO,
+        cn.COU_NOT_PERCENT AS PORCENTAJE,
+        n.NOT_VALUE,
+        n.NOT_TYPE,
+        n.COU_NOTES_ID,
+        rn.REC_ID,
+        rn.REC_VALUE,
+        rn.REC_OLD_VALUE,
+        rn.REC_OBSERVATION
+      FROM AMS_COURSE_SUBJECT cs
+      INNER JOIN AMS_TEACHERS t 
+        ON cs.TEA_PEO_ID = t.TEA_PEO_ID
+      INNER JOIN AMS_COURSES c 
+        ON cs.COU_ID = c.COU_ID
+      LEFT JOIN AMS_ESTUDENTS e 
+        ON c.COU_ID = e.COU_ID
+      LEFT JOIN AMS_EVALUATION ev 
+        ON cs.COS_ID = ev.EVA_COS_ID 
+        AND ev.EVA_PER_ID = ?
+      LEFT JOIN AMS_NOTES n 
+        ON ev.EVA_ID = n.EVA_ID 
+        AND e.EST_ID = n.NOT_EST_ID
+      LEFT JOIN AMS_COURSE_NOTES cn
+        ON ev.COU_NOTES_ID = cn.ID_COU_NOTES
+      LEFT JOIN AMS_RECOVERY_NOTES rn
+        ON ev.EVA_ID = rn.EVA_ID
+        AND e.EST_ID = rn.EST_ID
+      WHERE cs.COS_STATE = 'A'
+      ORDER BY 
+        t.TEA_LAST_NAME,  -- 🔥 Ordenamos primero por profesor
+        c.COU_LEVEL,
+        c.COU_NAME_TEACH,
+        cs.COS_SUBJECT_NAME,
+        e.EST_LAST_NAME,
+        ev.EVA_DATE ASC`,
+      [per_id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        message: 'No se encontró información académica para este periodo.'
+      });
+    }
+
+    // 4️⃣ Transformar SQL plano a JSON
+    const groupedData = {};
+
+    rows.forEach(row => {
+      // 🔥 Nueva clave única: Profesor + Curso + Materia
+      const key = `${row.ID_PROFESOR}-${row.COU_ID}-${row.COS_ID}`;
+
+      if (!groupedData[key]) {
+        groupedData[key] = {
+          id_profesor: row.ID_PROFESOR,
+          profesor: `${row.TEA_NAME} ${row.TEA_LAST_NAME}`,
+          id_curso: row.COU_ID,
+          nivel: row.COU_LEVEL,
+          curso: row.CURSO,
+          id_materia: row.COS_ID,
+          materia: row.ASIGNATURA,
+          estudiantes: {}
+        };
+      }
+
+      if (row.EST_ID) {
+        if (!groupedData[key].estudiantes[row.EST_ID]) {
+          groupedData[key].estudiantes[row.EST_ID] = {
+            id_estudiante: row.EST_ID,
+            identificacion: row.EST_IDENTIFICATION,
+            nombre: row.EST_NAME,
+            apellido: row.EST_LAST_NAME,
+            notas: []
+          };
+        }
+
+        if (row.EVA_ID) {
+          groupedData[key].estudiantes[row.EST_ID].notas.push({
+            id_evaluacion: row.EVA_ID,
+            actividad: row.ACTIVIDAD,
+            criterio: row.CRITERIO,
+            fechaEvaluacion: row.FechaEvaluacion,
+            porcentaje: row.PORCENTAJE,
+            nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
+            tipo_nota: row.NOT_TYPE,
+            criterio_nota_id: row.COU_NOTES_ID,
+            id_nota_recuperacion: row.REC_ID,
+            nota_recuperacion: row.REC_VALUE,
+            nota_anterior: row.REC_OLD_VALUE,
+            observacion_recuperacion: row.REC_OBSERVATION
+          });
+        }
+      }
+    });
+
+    // 5️⃣ Convertir objetos a arrays
+    const cargaAcademicaAdmin = Object.values(groupedData).map(item => ({
+      ...item,
+      estudiantes: Object.values(item.estudiantes)
+    }));
+
+    // 6️⃣ Respuesta final
+    return res.status(200).json({
+      data: {
+        content: {
+          periodo_consultado: per_id,
+          carga_academica: cargaAcademicaAdmin
+        },
+        status: true,
+        message: 'Planilla general de administrador obtenida correctamente'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR OBTENIENDO PLANILLA ADMIN:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};

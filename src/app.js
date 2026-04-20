@@ -30,6 +30,8 @@ import observerRoute from './routes/observer.route.js'
 
 import recoveryNote from './routes/recovery.notes.route.js'
 
+import annotationsRoute from './routes/annotations.route.js'
+
 
 import cors from 'cors';    
 
@@ -67,4 +69,5 @@ app.use('/', studentRoute)
 app.use('/', teachersRoute)
 app.use('/', observerRoute)
 app.use('/', recoveryNote)
+app.use('/', annotationsRoute)
 export default app;
