@@ -24,7 +24,7 @@ export const createAnnotation = async (req, res) => {
         }
 
         // 3. Inserción en la base de datos
-        await pool.query('INSERT INTO AMS_ANNOTATIONS (EST_ID, PER_ID, COU_ID, ANN_FAULT_TYPE, ANN_DATE, ANN_SUSPENDED, ANN_SUSPENDED_DAYS, ANN_OBSERVATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        await pool.query('INSERT INTO AMS_ANNOTATIONS (EST_ID, PER_ID, COU_ID, ANN_TYPE, ANN_DATE, ANN_SUSPENDED, ANN_SUSPENDED_DAYS, ANN_OBSERVATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 est_id, 
                 per_id, 
