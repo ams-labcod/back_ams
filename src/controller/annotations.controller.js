@@ -9,34 +9,31 @@ export const createAnnotation = async (req, res) => {
             est_id, 
             per_id, 
             cou_id, 
-            tipo_falta, 
-            fecha, 
-            suspendido, 
-            dias_suspendido, 
-            observacion 
+            ann_type, //tipo_falta, 
+            ann_date, //fecha, 
+            ann_suspended, //suspendido, 
+            ann_suspended_days, //dias_suspendido, 
+            ann_observation //observacion 
         } = req.body;
 
         // 2. Validación: Los campos clave no pueden estar vacíos
-        if (!est_id || !per_id || !cou_id || !tipo_falta || !fecha || !observacion) {
+        if (!est_id || !per_id || !cou_id || !ann_type || !ann_date || !ann_observation) {
             return res.status(400).json({ 
-                message: 'Faltan datos obligatorios (est_id, per_id, cou_id, tipo_falta, fecha, observacion).' 
+                message: 'Faltan datos obligatorios (est_id, per_id, cou_id, ann_type, ann_date, ann_observation).' 
             });
         }
 
         // 3. Inserción en la base de datos
-        await pool.query(
-            `INSERT INTO AMS_ANNOTATIONS 
-            (EST_ID, PER_ID, COU_ID, ANN_FAULT_TYPE, ANN_DATE, ANN_SUSPENDED, ANN_SUSPENDED_DAYS, ANN_OBSERVATION) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        await pool.query('INSERT INTO AMS_ANNOTATIONS (EST_ID, PER_ID, COU_ID, ANN_FAULT_TYPE, ANN_DATE, ANN_SUSPENDED, ANN_SUSPENDED_DAYS, ANN_OBSERVATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 est_id, 
                 per_id, 
                 cou_id, 
-                tipo_falta, 
-                fecha, 
-                suspendido ? 1 : 0, // Convertimos a 1 (Sí) o 0 (No) para la BD
-                dias_suspendido || 0, // Si no envían días, por defecto es 0
-                observacion
+                ann_type, 
+                ann_date, 
+                ann_suspended ? 1 : 0, // Convertimos a 1 (Sí) o 0 (No) para la BD
+                ann_suspended_days || 0, // Si no envían días, por defecto es 0
+                ann_observation
             ]
         );
 
