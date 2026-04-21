@@ -72,7 +72,7 @@ export const getAnnotations = async (req, res) => {
                 e.EST_ID AS id_estudiante,
                 CONCAT(e.EST_NAME, ' ', e.EST_LAST_NAME) AS nombre_estudiante,
                 a.ANN_DATE AS fecha,
-                a.ANN_FAULT_TYPE AS tipo_falta,
+                a.ANN_TYPE AS tipo_falta,
                 a.ANN_OBSERVATION AS observacion,
                 a.ANN_SUSPENDED AS suspendido,
                 a.ANN_SUSPENDED_DAYS AS dias_suspendido
