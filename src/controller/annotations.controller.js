@@ -57,7 +57,7 @@ export const createAnnotation = async (req, res) => {
 
 export const getAnnotations = async (req, res) => {
     try {
-        const { cou_id, per_id } = req.query;
+        const { cou_id, per_id } = req.params;
 
         if (!cou_id || !per_id) {
             return res.status(400).json({ 
