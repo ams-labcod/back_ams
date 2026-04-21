@@ -11,7 +11,7 @@ const router = Router()
 // Actualizar contadores de asistencia
 router.post('/assistance-summary/sync', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'),syncAssistanceSummary);
 
-router.get('/annotations', verifyJwt,validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'),getAnnotations);
+router.get('/annotations/:cou_id/:per_id', verifyJwt,validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'),getAnnotations);
 
 router.post('/annotations/create', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'), createAnnotation)
 
