@@ -21,12 +21,20 @@ export const getConsolidatedByCourse = async (req, res) => {
         cs.COS_SUBJECT_NAME AS MATERIA,
         ev.EVA_NAME AS ACTIVIDAD,
         n.NOT_VALUE AS NOTA
+        conv.CON_NOTE AS NotaConvivencia,
+        conv.CON_FINAL_NOTE AS NotaFinalConvivencia,
+        conv.CON_ACTIVITY AS ActividadConvivencia,
+        conv.COU_ID AS CursoIdConvivencia,
+        conv.EST_ID AS EstudianteConvivencia
       FROM AMS_COURSES c
       INNER JOIN AMS_ESTUDENTS e ON c.COU_ID = e.COU_ID
       INNER JOIN AMS_COURSE_SUBJECT cs ON c.COU_ID = cs.COU_ID
       INNER JOIN AMS_EVALUATION ev ON cs.COS_ID = ev.EVA_COS_ID
       INNER JOIN AMS_PERIOD p ON ev.EVA_PER_ID = p.PER_ID
       LEFT JOIN AMS_NOTES n ON ev.EVA_ID = n.EVA_ID AND e.EST_ID = n.NOT_EST_ID
+      LEFT JOIN AMS_CONVIVENCIA conv ON e.EST_ID = conv.EST_ID 
+      AND p.PER_ID = conv.PER_ID 
+      AND c.COU_ID = conv.COU_ID
       WHERE c.COU_ID = ?
     `;
 
