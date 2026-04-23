@@ -32,6 +32,8 @@ import recoveryNote from './routes/recovery.notes.route.js'
 
 import annotationsRoute from './routes/annotations.route.js'
 
+import convivenciaRoute from './routes/convivencia.route.js'
+
 
 import cors from 'cors';    
 
@@ -70,4 +72,6 @@ app.use('/', teachersRoute)
 app.use('/', observerRoute)
 app.use('/', recoveryNote)
 app.use('/', annotationsRoute)
+app.use('/', convivenciaRoute)
+
 export default app;
