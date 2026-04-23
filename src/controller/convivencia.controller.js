@@ -102,14 +102,14 @@ export const saveFinalConvivenciaGrade = async (req, res) => {
         } = req.body;
 
         // 2. Validación estricta
-        if (!est_id || !cou_id || !per_id || con_final_note === undefined, !con_activity) {
+        if (!est_id || !cou_id || !per_id || con_final_note === undefined ||  !con_activity) {
             return res.status(400).json({ 
                 message: 'Faltan datos obligatorios (est_id, cou_id, per_id, nota_final).' 
             });
         }
 
         // 3.creamos la nota final
-       const [result] =  await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = VALUES(CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY',
+       const [result] =  await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = VALUES(CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY)',
             [
                 est_id, 
                 per_id, 
