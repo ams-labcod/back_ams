@@ -95,7 +95,8 @@ export const saveFinalConvivenciaGrade = async (req, res) => {
         const { 
             est_id, 
             cou_id, 
-            per_id, 
+            per_id,
+            con_note, 
             con_final_note,
             con_activity
         } = req.body;
@@ -108,11 +109,12 @@ export const saveFinalConvivenciaGrade = async (req, res) => {
         }
 
         // 3.creamos la nota final
-        await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?)',
+       const [result] =  await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = VALUES(CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY',
             [
                 est_id, 
                 per_id, 
-                cou_id, 
+                cou_id,
+                con_note, 
                 con_final_note,
                 con_activity
             ]
@@ -122,7 +124,8 @@ export const saveFinalConvivenciaGrade = async (req, res) => {
             data: {
                 content: null,
                 status: true,
-                message: 'Nota final de convivencia guardada correctamente'
+                message: 'Nota final de convivencia guardada correctamente',
+                action: result.affectedRows === 1 ? 'Creada' : 'Actualizada'
             }
         });
 
