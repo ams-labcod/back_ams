@@ -20,7 +20,7 @@ export const getConsolidatedByCourse = async (req, res) => {
         CONCAT(e.EST_NAME, ' ', e.EST_LAST_NAME) AS ESTUDIANTE,
         cs.COS_SUBJECT_NAME AS MATERIA,
         ev.EVA_NAME AS ACTIVIDAD,
-        n.NOT_VALUE AS NOTA
+        n.NOT_VALUE AS NOTA,
         conv.CON_NOTE AS NotaConvivencia,
         conv.CON_FINAL_NOTE AS NotaFinalConvivencia,
         conv.CON_ACTIVITY AS ActividadConvivencia,

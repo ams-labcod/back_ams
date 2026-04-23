@@ -9,24 +9,26 @@ export const assignConvivenciaGrade = async (req, res) => {
             cou_id, 
             per_id, 
             con_note,
+            con_note_final,
             con_activity
         } = req.body;
 
         // 2. Validación estricta
-        if (!est_id || !cou_id || !per_id || con_note === undefined, !con_activity) {
+         if (!est_id || !cou_id || !per_id) {
             return res.status(400).json({ 
-                message: 'Faltan datos obligatorios (est_id, cou_id, per_id, nota_asignacion).' 
+                message: 'Faltan datos obligatorios (est_id, cou_id, per_id).' 
             });
         }
 
         // 3. Ejecutar el INSERT normal
-        await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?)',
+        const [result] = await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?,?) ON DUPLICATE KEY UPDATE  CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = COALESCE(VALUES(CON_FINAL_NOTE), CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY)',
             [
                 est_id, 
                 per_id, 
                 cou_id, 
-                con_note,
-                con_activity
+                con_note ?? null,
+                con_note_final ?? null,
+                con_activity ?? null
             ]
         );
 
@@ -34,7 +36,8 @@ export const assignConvivenciaGrade = async (req, res) => {
             data: {
                 content: null,
                 status: true,
-                message: 'Nota de convivencia asignada correctamente'
+                message: 'Nota de convivencia asignada correctamente',
+                action: result.affectedRows === 1 ? 'Creada' : 'Actualizada'
             }
         });
 
@@ -87,54 +90,3 @@ export const getConvivenciaGrades = async (req, res) => {
     }
 };
 
-
-//* Guardar Nota Final de Convivencia
-export const saveFinalConvivenciaGrade = async (req, res) => {
-    try {
-        // 1. Recibimos los datos exactos que me pediste
-        const { 
-            est_id, 
-            cou_id, 
-            per_id,
-            con_note, 
-            con_final_note,
-            con_activity
-        } = req.body;
-
-        // 2. Validación estricta
-        if (!est_id || !cou_id || !per_id || con_final_note === undefined ||  !con_activity) {
-            return res.status(400).json({ 
-                message: 'Faltan datos obligatorios (est_id, cou_id, per_id, nota_final).' 
-            });
-        }
-
-        // 3.creamos la nota final
-       const [result] =  await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = VALUES(CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY)',
-            [
-                est_id, 
-                per_id, 
-                cou_id,
-                con_note, 
-                con_final_note,
-                con_activity
-            ]
-        );
-
-        return res.status(200).json({
-            data: {
-                content: null,
-                status: true,
-                message: 'Nota final de convivencia guardada correctamente',
-                action: result.affectedRows === 1 ? 'Creada' : 'Actualizada'
-            }
-        });
-
-    } catch (error) {
-        console.error('❌ ERROR GUARDANDO NOTA FINAL DE CONVIVENCIA:', error);
-        return res.status(500).json({
-            status: false,
-            message: 'Error interno del servidor al guardar la nota final',
-            error: error.message
-        });
-    }
-};
