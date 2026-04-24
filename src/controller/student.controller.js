@@ -149,10 +149,13 @@ export const getMyGrades = async (req, res) => {
 
     // 4️⃣ Formateamos el JSON para hacerle la vida fácil al frontend
     const response = {
-      IdEstudiante: row[0].IdEstudiante,
+      IdEstudiante: rows[0].IdEstudiante,
       CursoID: rows[0].CursoID,
       CursoNivel: rows[0].CursoNivel,
       CURSO: rows[0].CURSO,
+      NotaConvivencia: rows[0].NOTA_CONVIVENCIA,
+      NotaConvivenciaFinal: rows[0].NOTA_CONVIVENCIA_FINAL,
+      ActividadConvivencia: rows[0].ACTIVIDAD_CONVIVENCIA,
       calificaciones: rows.map(row => ({
         PeriodoID: row.PeriodoID,
         PERIODO: row.PERIODO,
