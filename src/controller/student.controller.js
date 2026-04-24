@@ -103,7 +103,7 @@ export const getMyGrades = async (req, res) => {
     // 2️⃣ Construimos la consulta base filtrando estrictamente por el EST_PEO_ID
     let sqlQuery = `
       SELECT 
-        e.ESTE_ID AS IdEstudiante,
+        e.EST_ID AS IdEstudiante,
         c.COU_ID as CursoID,
         c.COU_LEVEL as CursoNivel,
         c.COU_NAME_TEACH AS CURSO,
