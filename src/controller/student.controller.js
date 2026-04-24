@@ -103,6 +103,7 @@ export const getMyGrades = async (req, res) => {
     // 2️⃣ Construimos la consulta base filtrando estrictamente por el EST_PEO_ID
     let sqlQuery = `
       SELECT 
+        e.ESTE_ID AS IdEstudiante,
         c.COU_ID as CursoID,
         c.COU_LEVEL as CursoNivel,
         c.COU_NAME_TEACH AS CURSO,
@@ -148,6 +149,7 @@ export const getMyGrades = async (req, res) => {
 
     // 4️⃣ Formateamos el JSON para hacerle la vida fácil al frontend
     const response = {
+      IdEstudiante: row[0].IdEstudiante,
       CursoID: rows[0].CursoID,
       CursoNivel: rows[0].CursoNivel,
       CURSO: rows[0].CURSO,
