@@ -75,6 +75,55 @@ export const getConsolidatedByCourse = async (req, res) => {
   }
 };
 
+export const getConsolidatedConvivencia = async (req, res) => {
+  try {
+    const { cou_id } = req.params;
+
+    if (!cou_id) {
+      return res.status(400).json({
+        message: 'Debe especificar el curso (cou_id).'
+      });
+    }
+
+    const [rows] = await pool.query(
+      `SELECT 
+                c.COU_ID as CursoID,
+                c.COU_LEVEL as CursoNivel,
+                c.COU_NAME_TEACH AS CURSO,
+                p.PER_ID as PeriodoID,
+                p.PER_NAME AS PERIODO, 
+                e.EST_IDENTIFICATION AS IDENTIFICACION,
+                CONCAT(e.EST_NAME, ' ', e.EST_LAST_NAME) AS ESTUDIANTE,
+                'Convivencia' AS MATERIA,      -- Mapeado como materia
+                conv.CON_ACTIVITY AS ACTIVIDAD, -- Mapeado como actividad
+                conv.CON_FINAL_NOTE AS NOTA     -- Mapeado como nota
+            FROM AMS_CONVIVENCIA conv
+            INNER JOIN AMS_ESTUDENTS e ON conv.EST_ID = e.EST_ID
+            INNER JOIN AMS_COURSES c ON conv.COU_ID = c.COU_ID
+            INNER JOIN AMS_PERIOD p ON conv.PER_ID = p.PER_ID
+            WHERE conv.COU_ID = ?
+            ORDER BY e.EST_LAST_NAME ASC`,
+      [cou_id]
+    );
+
+    return res.status(200).json({
+      data: {
+        content: rows, // Retorna el array [{CursoID, ESTUDIANTE, MATERIA, NOTA...}]
+        status: true,
+        message: rows.length > 0 ? 'Datos de convivencia estructurados correctamente' : 'No hay datos'
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ ERROR CONSOLIDADO CONVIVENCIA:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
 
 export const assignGroupDirector = async (req, res) => {
 
@@ -352,7 +401,7 @@ export const getTeacherGradebook = async (req, res) => {
 
     const tea_id = req.user.tea_peo_id
 
-    if (!tea_id) return res.status(404).json({errorMessage: 'No se identifico al docente'})
+    if (!tea_id) return res.status(404).json({ errorMessage: 'No se identifico al docente' })
 
     // 1️⃣ Periodo desde la URL
     const { per_id } = req.query;
@@ -438,7 +487,7 @@ export const getTeacherGradebook = async (req, res) => {
         cs.COS_SUBJECT_NAME,
         e.EST_LAST_NAME,
         ev.EVA_DATE ASC`,
-      [per_id,tea_id]
+      [per_id, tea_id]
     );
 
     if (rows.length === 0) {
@@ -490,7 +539,7 @@ export const getTeacherGradebook = async (req, res) => {
             porcentaje: row.PORCENTAJE,
             nota: row.NOT_VALUE !== null ? row.NOT_VALUE : null,
             tipo_nota: row.NOT_TYPE,
-            criterio_nota_id : row.COU_NOTES_ID,
+            criterio_nota_id: row.COU_NOTES_ID,
             id_nota_recuperacion: row.REC_ID,
             nota_recuperacion: row.REC_VALUE,
             nota_anterior: row.REC_OLD_VALUE,

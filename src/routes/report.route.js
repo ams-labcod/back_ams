@@ -4,7 +4,7 @@ import { verifyJwt } from '../middlewares/verifyToken.js';
 
 import { validateRoles } from "../middlewares/validateRols.js";
 
-import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook, getMyDirector, getAdminGradebook } from "../controller/report.controller.js";
+import { getConsolidatedByCourse, assignGroupDirector, getAllCourseDirectors, getTeacherGradebook, getMyDirector, getAdminGradebook, getConsolidatedConvivencia } from "../controller/report.controller.js";
 
 const router = Router()
 
@@ -13,6 +13,9 @@ router.patch('/teachers/:tea_peo_id/director',verifyJwt, validateRoles('ROL_ADMI
 
 //* - este reporte lo tendria que ver el administrativo y el director de grupo 
 router.get('/consolidated/:cou_id', verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO','ROL_TEACHER','ROL_STUDENT'),  getConsolidatedByCourse )
+
+
+router.get('/consolidated/convivencia/:cou_id', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO', 'ROL_STUDENT'), getConsolidatedConvivencia)
 
 //* Todos los cursos con sus directores
 router.get(
