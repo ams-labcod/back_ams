@@ -67,7 +67,7 @@ export const getConvivenciaGrades = async (req, res) => {
         }
 
         // 3. Consulta a la base de datos
-        const [rows] = await pool.query( `SELECT * FROM AMS_CONVIVENCIA WHERE COU_ID = ? AND PER_ID = ? AND CON_ACTIVITY = 'Asignacion'  `,
+        const [rows] = await pool.query( `SELECT * FROM AMS_CONVIVENCIA WHERE COU_ID = ? AND PER_ID = ?`,
             [cou_id, per_id]
         );
 
