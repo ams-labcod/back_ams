@@ -21,7 +21,7 @@ export const assignConvivenciaGrade = async (req, res) => {
         }
 
         // 3. Ejecutar el INSERT normal
-        const [result] = await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?,?) ON DUPLICATE KEY UPDATE  CON_NOTE = VALUES(CON_NOTE), CON_FINAL_NOTE = COALESCE(VALUES(CON_FINAL_NOTE), CON_FINAL_NOTE), CON_ACTIVITY = VALUES(CON_ACTIVITY)',
+        const [result] = await pool.query('INSERT INTO AMS_CONVIVENCIA (EST_ID, PER_ID, COU_ID, CON_NOTE,CON_FINAL_NOTE, CON_ACTIVITY) VALUES (?, ?, ?, ?, ?,?)',
             [
                 est_id, 
                 per_id, 
@@ -34,10 +34,9 @@ export const assignConvivenciaGrade = async (req, res) => {
 
         return res.status(201).json({
             data: {
-                content: null,
+                content: { con_id: result.insertId },
                 status: true,
-                message: 'Nota de convivencia asignada correctamente',
-                action: result.affectedRows === 1 ? 'Creada' : 'Actualizada'
+                message: 'Nota de convivencia asignada correctamente'
             }
         });
 
@@ -47,6 +46,55 @@ export const assignConvivenciaGrade = async (req, res) => {
         return res.status(500).json({
             status: false,
             message: 'Error interno del servidor al asignar la nota de convivencia',
+            error: error.message
+        });
+    }
+};
+
+//* ACTUALIZAR Nota de Convivencia específica
+export const updateConvivenciaGrade = async (req, res) => {
+    try {
+        const { con_id } = req.params; // Lo sacamos de la URL
+        const { con_note, con_activity } = req.body;
+
+        if (!con_id) {
+            return res.status(400).json({ 
+                message: 'Debe especificar el ID de la nota en la URL (con_id).' 
+            });
+        }
+
+        // Usamos COALESCE para que si el frontend no envía algún dato, se conserve el que ya estaba en la BD
+        const [result] = await pool.query(
+            `UPDATE AMS_CONVIVENCIA 
+             SET CON_NOTE = COALESCE(?, CON_NOTE), 
+                 CON_ACTIVITY = COALESCE(?, CON_ACTIVITY) 
+             WHERE CON_ID = ?`,
+            [
+                con_note ?? null, 
+                con_activity ?? null, 
+                con_id
+            ]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                message: 'La nota especificada no existe.' 
+            });
+        }
+
+        return res.status(200).json({
+            data: {
+                content: null,
+                status: true,
+                message: 'Nota de convivencia actualizada correctamente'
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ ERROR ACTUALIZANDO NOTA DE CONVIVENCIA:', error);
+        return res.status(500).json({
+            status: false,
+            message: 'Error interno del servidor al actualizar la nota',
             error: error.message
         });
     }
