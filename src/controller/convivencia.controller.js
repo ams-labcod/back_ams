@@ -53,7 +53,7 @@ export const assignConvivenciaGrade = async (req, res) => {
 };
 
 
-//* Obtener Notas de Convivencia por Curso y Periodo
+//* Obtener Notas de Convivencia por Curso y Periodo - FILTRO ASIGNACION
 export const getConvivenciaGrades = async (req, res) => {
     try {
         // 1. Extraemos los parámetros de la URL 
@@ -67,7 +67,7 @@ export const getConvivenciaGrades = async (req, res) => {
         }
 
         // 3. Consulta a la base de datos
-        const [rows] = await pool.query( `SELECT EST_ID AS est_id, CON_NOTE AS nota_asignacion FROM AMS_CONVIVENCIA WHERE COU_ID = ? AND PER_ID = ? AND CON_ACTIVITY = 'Asignacion'  `,
+        const [rows] = await pool.query( `SELECT * FROM AMS_CONVIVENCIA WHERE COU_ID = ? AND PER_ID = ? AND CON_ACTIVITY = 'Asignacion'  `,
             [cou_id, per_id]
         );
 
