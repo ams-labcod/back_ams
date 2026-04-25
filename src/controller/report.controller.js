@@ -94,9 +94,7 @@ export const getConsolidatedConvivencia = async (req, res) => {
                 p.PER_NAME AS PERIODO, 
                 e.EST_IDENTIFICATION AS IDENTIFICACION,
                 CONCAT(e.EST_NAME, ' ', e.EST_LAST_NAME) AS ESTUDIANTE,
-                'Convivencia' AS MATERIA,      -- Mapeado como materia
-                conv.CON_ACTIVITY AS ACTIVIDAD, -- Mapeado como actividad
-                conv.CON_FINAL_NOTE AS NOTA     -- Mapeado como nota
+                conv.CON_NOTE AS NOTA 
             FROM AMS_CONVIVENCIA conv
             INNER JOIN AMS_ESTUDENTS e ON conv.EST_ID = e.EST_ID
             INNER JOIN AMS_COURSES c ON conv.COU_ID = c.COU_ID
