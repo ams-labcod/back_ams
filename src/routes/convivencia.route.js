@@ -12,7 +12,7 @@ const router = Router()
 router.post('/convivencia/asignacion', verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO'), assignConvivenciaGrade)
 
 //* trae la nota
-router.get('/convivencia/asignacion/:cou_id/:per_id', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'), getConvivenciaGrades)
+router.get('/convivencia/asignacion/:cou_id/:per_id', verifyJwt, validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO', 'ROL_STUDENT'), getConvivenciaGrades)
 
 router.put('/convivencia/asignacion/:con_id', verifyJwt,validateRoles('ROL_TEACHER', 'ROL_ADMINISTRATIVO'), updateConvivenciaGrade);
 
