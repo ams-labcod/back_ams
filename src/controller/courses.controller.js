@@ -6,7 +6,7 @@ export const createCourse = async (req, res) => {
 
   try {
 
-    const { cou_level, cou_name_teach, cou_num_courses } = req.body;
+    let { cou_level, cou_name_teach, cou_num_courses } = req.body;
 
     let nivel = cou_level
 
