@@ -588,7 +588,7 @@ export const update_person = async (req, res) => {
         PEO_LEVEL = ?, PEO_GRADE = ?, PEO_GRADE_L = ?, PEO_SEX = ?, PEO_BIRTH = ?, 
         PEO_PLACE_BIRTH = ?, PEO_CEL = ?, PEO_EMAIL = ?, PEO_CITY = ?, PEO_DEPARTAMENT = ?, 
         PEO_ADDRESS = ?, PEO_EPS = ?, PEO_POPULATION = ?, PEO_PREV_SCHOOL = ?, 
-        PEO_ALLERGIES = ?, PEO_CONDITION = ?, PEO_TP_ID = ?, PEO_IDENTIFICATION
+        PEO_ALLERGIES = ?, PEO_CONDITION = ?, PEO_TP_ID = ?, PEO_IDENTIFICATION = ?
        WHERE PEO_ID = ?`,
       [
         usu_name1, usu_name2, usu_lastname1, usu_lastname2, usu_level, usu_grade, usu_grade_l,

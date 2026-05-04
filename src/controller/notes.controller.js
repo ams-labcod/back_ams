@@ -195,3 +195,76 @@ export const getStudentNotes = async (req, res) => {
     return res.status(500).json({ errorMessage: 'Error en el servidor al obtener las notas' });
   }
 };
+
+//* update
+export const updateNote = async (req = request, res = response) => {
+  try {
+    const { eva_id, not_est_id } = req.params
+    const { not_value, not_date, not_type, cou_notes_id, not_average } = req.body
+
+    // Verificar que la nota existe
+    const [existing] = await pool.query(
+      'SELECT NOT_ID FROM AMS_NOTES WHERE EVA_ID = ? AND NOT_EST_ID = ?',
+      [eva_id, not_est_id]
+    )
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        data: {
+          content: null,
+          status: false,
+          message: 'Nota no encontrada para este estudiante y evaluación'
+        }
+      })
+    }
+
+    // Validar que el estudiante existe
+    const [validateStudent] = await pool.query(
+      'SELECT EST_ID FROM AMS_ESTUDENTS WHERE EST_ID = ?', [not_est_id]
+    )
+    if (validateStudent.length === 0) {
+      return res.status(400).json({ errorMessage: 'El estudiante no existe' })
+    }
+
+    // Validar que la evaluación existe
+    const [validateEvaluation] = await pool.query(
+      'SELECT EVA_ID FROM AMS_EVALUATION WHERE EVA_ID = ?', [eva_id]
+    )
+    if (validateEvaluation.length === 0) {
+      return res.status(400).json({ errorMessage: 'La evaluación no existe' })
+    }
+
+    // Validar criterio si viene en el body
+    if (cou_notes_id) {
+      const [validateCriteria] = await pool.query(
+        'SELECT ID_COU_NOTES FROM AMS_COURSE_NOTES WHERE ID_COU_NOTES = ?', [cou_notes_id]
+      )
+      if (validateCriteria.length === 0) {
+        return res.status(400).json({ errorMessage: 'El criterio de evaluación especificado no existe' })
+      }
+    }
+
+    const [result] = await pool.query(
+      `UPDATE AMS_NOTES 
+       SET NOT_VALUE = ?, NOT_DATE = ?, NOT_TYPE = ?, COU_NOTES_ID = ?, NOT_AVERAGE = ?
+       WHERE EVA_ID = ? AND NOT_EST_ID = ?`,
+      [not_value, not_date, not_type, cou_notes_id ?? null, not_average ?? null, eva_id, not_est_id]
+    )
+
+    return res.status(200).json({
+      data: {
+        content: { affectedRows: result.affectedRows },
+        status: true,
+        message: 'Nota actualizada correctamente'
+      }
+    })
+
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
+}
