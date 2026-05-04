@@ -236,7 +236,7 @@ router.get('/users/:id_users', verifyJwt, getUserProfileByUser)
 
 router.delete('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMINISTRATIVO', 'ROL_ADMIN'), delete_person)
 
-router.put('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
+router.patch('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
 
 router.post('/auth/correo-recuperar', EnviarCorreoRecuperacion);
 
