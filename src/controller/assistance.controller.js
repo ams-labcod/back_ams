@@ -83,3 +83,51 @@ export const createAssitance = async (req = request, res = response) => {
   }
 
 }
+
+
+//* update
+export const updateAssistance = async (req = request, res = response) => {
+  try {
+    
+    const { id } = req.params
+    const { est_id, cos_id, ass_date, ass_comment } = req.body
+
+    // Verificar que la asistencia existe
+    const [existing] = await pool.query(
+      'SELECT ASS_ID FROM AMS_ASSISTANCE WHERE ASS_ID = ?', [id]
+    )
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        data: {
+          content: null,
+          status: false,
+          message: 'Asistencia no encontrada'
+        }
+      })
+    }
+
+    const [result] = await pool.query(
+      `UPDATE AMS_ASSISTANCE 
+       SET EST_ID = ?, COS_ID = ?, ASS_DATE = ?, ASS_COMMENT = ?
+       WHERE ASS_ID = ?`,
+      [est_id, cos_id, ass_date, ass_comment, id]
+    )
+
+    return res.status(200).json({
+      data: {
+        content: { affectedRows: result.affectedRows },
+        status: true,
+        message: 'Asistencia actualizada correctamente'
+      }
+    })
+
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
+}

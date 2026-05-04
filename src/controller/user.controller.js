@@ -557,7 +557,9 @@ export const update_person = async (req, res) => {
     usu_population,
     usu_prev_school,
     usu_allergies,
-    usu_condition
+    usu_condition,
+    peo_tp_id,
+    peo_identification
   } = req.body;
 
   let connection;
@@ -586,12 +588,12 @@ export const update_person = async (req, res) => {
         PEO_LEVEL = ?, PEO_GRADE = ?, PEO_GRADE_L = ?, PEO_SEX = ?, PEO_BIRTH = ?, 
         PEO_PLACE_BIRTH = ?, PEO_CEL = ?, PEO_EMAIL = ?, PEO_CITY = ?, PEO_DEPARTAMENT = ?, 
         PEO_ADDRESS = ?, PEO_EPS = ?, PEO_POPULATION = ?, PEO_PREV_SCHOOL = ?, 
-        PEO_ALLERGIES = ?, PEO_CONDITION = ?
+        PEO_ALLERGIES = ?, PEO_CONDITION = ?, PEO_TP_ID = ?, PEO_IDENTIFICATION
        WHERE PEO_ID = ?`,
       [
         usu_name1, usu_name2, usu_lastname1, usu_lastname2, usu_level, usu_grade, usu_grade_l,
         usu_sex, usu_birth, usu_place_birth, usu_cel, usu_correo, usu_city, usu_departament,
-        usu_address, usu_eps, usu_population, usu_prev_school, usu_allergies, usu_condition,
+        usu_address, usu_eps, usu_population, usu_prev_school, usu_allergies, usu_condition, peo_tp_id, peo_identification,
         peo_id
       ]
     );
