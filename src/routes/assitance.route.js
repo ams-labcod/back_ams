@@ -17,5 +17,5 @@ router.get('/getAllAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN
 router.post('/createAssistance', verifyJwt,validateRoles('ROL_TEACHER','ROL_ADMIN','ROL_ADMINISTRATIVO'), createAssitance)
 
 //* update
-router.put('/:id',verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO'), updateAssistance)
+router.put('/updateAssitance/:id',verifyJwt, validateRoles('ROL_TEACHER','ROL_ADMINISTRATIVO'), updateAssistance)
 export default router
