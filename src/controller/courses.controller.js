@@ -230,3 +230,52 @@ export const disableCourse = async (req, res) => {
     })
   }
 };
+
+//* Reasignar estudiante a otro curso
+export const updateStudentCourse = async (req, res) => {
+
+  try {
+    const { id } = req.params;  // EST_PEO_ID del estudiante
+    const { cou_id } = req.body; // Nuevo COU_ID
+
+    // Verificar que el curso destino existe
+    const [course] = await pool.query(
+      'SELECT COU_ID FROM AMS_COURSES WHERE COU_ID = ?',
+      [cou_id]
+    );
+
+    if (course.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: 'El curso destino no existe'
+      });
+    }
+
+    // Reasignar estudiante al nuevo curso
+    const [result] = await pool.query(
+      'UPDATE AMS_ESTUDENTS SET COU_ID = ? WHERE EST_PEO_ID = ?',
+      [cou_id, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: false,
+        message: 'Estudiante no encontrado'
+      });
+    }
+
+    return res.status(200).json({
+      content: null,
+      status: true,
+      message: 'Estudiante reasignado al curso correctamente'
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};

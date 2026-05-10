@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { check } from 'express-validator';
 
-import { createCourse, getCourseById, getAllCourses, getAllCoursesAct, updateCourse, disableCourse} from '../controller/courses.controller.js'
+import { createCourse, getCourseById, getAllCourses, getAllCoursesAct, updateCourse, disableCourse, updateStudentCourse} from '../controller/courses.controller.js'
 
 import { validations } from '../middlewares/validations.js';
 
@@ -167,6 +167,9 @@ router.get('/getAllCourses', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRA
 router.get('/getAllCourseAct', verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), getAllCoursesAct);
 
 router.put('/courses/:id',verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'), updateCourse )
+
+//* reasignar estudiante a otro curso
+router.put('/courses/updateStudent/:id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), updateStudentCourse)
 
 router.patch('/courses/:id',verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),disableCourse)
 
