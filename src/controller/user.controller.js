@@ -667,7 +667,11 @@ export const EnviarCorreoRecuperacion = async (req, res) => {
     );
 
     //const link = `https://ams-front-puce.vercel.app/auth/forgot-password/${token}`;
-    const link = `http://localhost:3000/auth/forgot-password/${token}`;
+    //const link = `http://localhost:3000/auth/forgot-password/${token}`;
+
+    const frontendUrl = process.env.FRONTEND_URL;
+
+    const link = `${frontendUrl}/auth/forgot-password/${token}`;
 
     const { error } = await resend.emails.send({
       from: 'AMS Sistema <noreply@alejandrocorralesb.com>',
