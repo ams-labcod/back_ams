@@ -176,3 +176,36 @@ export const disableCourseSubject = async (req, res) => {
         })
   }
 };
+
+//* ACtivar materia
+export const enableCourseSubject = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await pool.query(
+      'UPDATE AMS_COURSE_SUBJECT SET COS_STATE = ? WHERE COS_ID = ?',
+      ['A', id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'La materia no existe' });
+    }
+
+    return res.status(200).json({
+      data: {
+        content: null,
+        status: true,
+        message: 'Materia activada correctamente'
+      }
+    });
+
+  } catch (error) {
+    console.error(error)
+
+        return res.status(500).json({
+            status: false,
+            message: 'Error interno del servidor',
+            error: error.message
+        })
+  }
+};
