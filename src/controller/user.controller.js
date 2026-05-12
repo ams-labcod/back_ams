@@ -531,6 +531,43 @@ export const delete_person = async (req, res) => {
   }
 };
 
+//* Activar usuario
+
+export const activate_person = async (req, res) => {
+  const { peo_id } = req.params;
+
+  try {
+
+    const [person] = await pool.query('SELECT PEO_ID FROM AMS_PEOPLE WHERE PEO_ID = ?', [peo_id]);
+
+    if (person.length === 0) {
+      return res.status(404).json({ message: 'El usuario no existe en el sistema' });
+    }
+
+  
+    await pool.query(
+      `UPDATE AMS_PEOPLE SET PEO_STATE = 'A' WHERE PEO_ID = ?`,
+      [peo_id]
+    );
+
+    const response = {
+      content: null,
+      status: true,
+      message: 'Usuario Activado correctamente'
+    };
+
+    return res.status(200).json({ data: response });
+
+  } catch (error) {
+    console.error('❌ ERROR ACTIVATE_PERSON:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor al intentar activar el usuario',
+      error: error.message
+    });
+  }
+};
+
 
 
 export const update_person = async (req, res) => {

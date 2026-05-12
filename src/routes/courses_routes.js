@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import { check } from 'express-validator';
 
-import { createCourse, getCourseById, getAllCourses, getAllCoursesAct, updateCourse, disableCourse, updateStudentCourse} from '../controller/courses.controller.js'
+import { createCourse, getCourseById, getAllCourses, getAllCoursesAct, updateCourse, disableCourse, updateStudentCourse, enableCourse} from '../controller/courses.controller.js'
 
 import { validations } from '../middlewares/validations.js';
 
@@ -172,5 +172,7 @@ router.put('/courses/:id',verifyJwt, validateRoles('ROL_ADMIN','ROL_ADMINISTRATI
 router.put('/courses/updateStudent/:id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), updateStudentCourse)
 
 router.patch('/courses/:id',verifyJwt,validateRoles('ROL_ADMIN','ROL_ADMINISTRATIVO'),disableCourse)
+
+router.patch('/courses/activate/:id',verifyJwt, validateRoles('ROL_ADMINISTRATIVO'), enableCourse)
 
 export default router;

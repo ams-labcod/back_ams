@@ -231,6 +231,42 @@ export const disableCourse = async (req, res) => {
   }
 };
 
+//* ACtivar curso
+export const enableCourse = async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    const [result] = await pool.query(
+      'UPDATE AMS_COURSES SET COU_STATE = ? WHERE COU_ID = ?',
+      ['A', id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'El curso no existe' });
+    }
+
+    const response = {
+      content: null,
+      status: true,
+      message: 'Curso activado correctamente'
+    };
+
+    return res.status(200).json({ data: response });
+
+  } catch (error) {
+    console.error(error)
+
+    return res.status(500).json({
+      status: false,
+      message: 'Error interno del servidor',
+      error: error.message
+    })
+  }
+};
+
+
+
 //* Reasignar estudiante a otro curso
 export const updateStudentCourse = async (req, res) => {
 
