@@ -236,7 +236,7 @@ router.get('/users/:id_users', verifyJwt, getUserProfileByUser)
 
 router.delete('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMINISTRATIVO', 'ROL_ADMIN'), delete_person)
 
-router.param('/users/activate/:peo_id', verifyJwt, validateRoles('ROL_ADMINISTRATIVO'), activate_person)
+router.patch('/users/activate/:peo_id', verifyJwt, validateRoles('ROL_ADMINISTRATIVO'), activate_person)
 
 router.put('/users/:peo_id', verifyJwt, validateRoles('ROL_ADMIN', 'ROL_ADMINISTRATIVO'), update_person);
 
