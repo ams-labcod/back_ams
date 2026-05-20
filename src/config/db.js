@@ -12,7 +12,7 @@ import '../utils/env.js'
 export const pool = createPool({
    // // // //  //'mysql://ue6lzi4rzrwbgeew:p3DNp4j6ogym2GBpeY9n@blj394itpypibv4ybum6-mysql.services.clever-cloud.com:3306/blj394itpypibv4ybum6' -> CLEVER
    //uri:'mysql://root:ezhOhvAzRKHMePpLeQrTysKoutsQjnqQ@interchange.proxy.rlwy.net:29405/railway', //-> RAILWAY DEV
-   uri: 'mysql://root:xvkBnDCOARbhcmXrFOKpLoShdOdbLqHC@yamabiko.proxy.rlwy.net:35033/railway',
+   uri: process.env.URI_MYSQL_PRD,
    waitForConnections: true,
    connectionLimit: 10,
    queueLimit: 0,
