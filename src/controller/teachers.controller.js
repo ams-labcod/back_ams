@@ -229,7 +229,7 @@ export const updateCourseCriteria = async (req, res) => {
         // 4. Actualizar los 4 criterios basándonos en el nombre (criterio)
         for (const item of criterios) {
             await connection.query(
-                'UPDATE AMS_COURSE_NOTES SET COU_NOT_PERCENT = ? WHERE PER_ID = ? AND TEA_ID = ? AND COU_NOT_CRITERIA = ?',
+                'UPDATE AMS_COURSE_NOTES SET COU_NOT_PERCENT = ?, COU_NOT_CRITERIA = ? WHERE PER_ID = ? AND TEA_ID = ? AND COU_NOT_CRITERIA = ?',
                 [item.porcentaje, per_id, tea_id, item.nombre]
             );
         }
