@@ -214,7 +214,7 @@ export const updateCourseCriteria = async (req, res) => {
 
         // 3. Validar que SÍ existan criterios previos
         const [existingCriteria] = await connection.query(
-            'SELECT COU_NOT_CRITERIA FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
+            'SELECT ID_COU_NOTES FROM AMS_COURSE_NOTES WHERE PER_ID = ? AND TEA_ID = ?',
             [per_id, tea_id]
         );
 
@@ -229,8 +229,8 @@ export const updateCourseCriteria = async (req, res) => {
         // 4. Actualizar los 4 criterios basándonos en el nombre (criterio)
         for (const item of criterios) {
             await connection.query(
-                'UPDATE AMS_COURSE_NOTES SET COU_NOT_PERCENT = ?, COU_NOT_CRITERIA = ? WHERE PER_ID = ? AND TEA_ID = ? AND COU_NOT_CRITERIA = ?',
-                [item.porcentaje,item.nombre, per_id, tea_id, item.nombre]
+                'UPDATE AMS_COURSE_NOTES SET COU_NOT_PERCENT = ?, COU_NOT_CRITERIA = ? WHERE ID_COU_NOTES = ? AND TEA_ID = ? AND PER_ID = ?',
+                [item.porcentaje,item.nombre, item.id, tea_id, per_id]
             );
         }
 
